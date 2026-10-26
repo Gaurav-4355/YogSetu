@@ -9,11 +9,22 @@ export interface Pose {
   id: string;
   hindi_name: string;
   english_name: string;
+  hinglish_name: string;
+  /** Hinglish steps (default) */
   how_to: string[];
+  /** English steps */
+  how_to_en: string[];
+  /** Hindi steps */
+  how_to_hi: string[];
   default_hold_seconds: number;
   camera_supported: boolean;
   angle_rules?: Record<string, any>;
+  /** Hinglish caution (default) */
   caution: string;
+  /** English caution */
+  caution_en: string;
+  /** Hindi caution */
+  caution_hi: string;
 }
 
 export interface PlanItem {
