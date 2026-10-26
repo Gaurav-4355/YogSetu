@@ -1,0 +1,558 @@
+import React, { useEffect, useRef, useState } from 'react';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { FilesetResolver, PoseLandmarker } from '@mediapipe/tasks-vision';
+import { api, Pose } from '../api/client';
+import { useAuth } from '../context/AuthContext';
+import { evaluatePose, PoseEvaluation } from '../lib/poseRules';
+import { voiceCoach } from '../lib/speech';
+import { SkeletonOverlay } from '../components/SkeletonOverlay';
+import { AccuracyGauge } from '../components/AccuracyGauge';
+import {
+  Volume2,
+  VolumeX,
+  Clock,
+  AlertTriangle,
+  CheckCircle2,
+  XCircle,
+  ArrowLeft,
+  Bug,
+} from 'lucide-react';
+
+export const SessionPage: React.FC = () => {
+  const { poseId } = useParams<{ poseId: string }>();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const assignmentId = searchParams.get('assignmentId')
+    ? Number(searchParams.get('assignmentId'))
+    : null;
+  const source = (searchParams.get('source') as 'doctor' | 'self') || 'self';
+  const isDebug = searchParams.get('debug') === '1';
+
+  const [pose, setPose] = useState<Pose | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [cameraActive, setCameraActive] = useState(false);
+  const [muted, setMuted] = useState(false);
+
+  // Video & Canvas references
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const streamRef = useRef<MediaStream | null>(null);
+  const landmarkerRef = useRef<PoseLandmarker | null>(null);
+  const animFrameIdRef = useRef<number | null>(null);
+
+  // Pose evaluation states
+  const [evaluation, setEvaluation] = useState<PoseEvaluation>({
+    isCorrect: false,
+    accuracy: 0,
+    feedback: 'Frame mein khade hokar aasan shuru karein.',
+    primaryAngle: 0,
+    angles: {},
+  });
+  const [landmarks, setLandmarks] = useState<any[] | null>(null);
+  const [bestAngle, setBestAngle] = useState<number | null>(null);
+
+  // Hold Timer and Sets
+  const targetHold = pose?.default_hold_seconds || 20;
+  const [holdTimer, setHoldTimer] = useState(0);
+  const [currentSet, setCurrentSet] = useState(1);
+  const totalSets = 2;
+  const [isResting, setIsResting] = useState(false);
+  const [restTimer, setRestTimer] = useState(10);
+
+  // Pain Modal State
+  const [painModalOpen, setPainModalOpen] = useState(false);
+  const [painNote, setPainNote] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  // Load pose details
+  useEffect(() => {
+    api.getPoses().then((poses) => {
+      const found = poses.find((p) => p.id === poseId);
+      if (found) {
+        setPose(found);
+      }
+      setLoading(false);
+    });
+  }, [poseId]);
+
+  // Voice coach sync
+  useEffect(() => {
+    voiceCoach.setMuted(muted);
+    return () => {
+      voiceCoach.stop();
+    };
+  }, [muted]);
+
+  // Initialize MediaPipe PoseLandmarker if camera supported
+  useEffect(() => {
+    if (!pose || !pose.camera_supported) return;
+
+    let isMounted = true;
+    async function initMediaPipe() {
+      try {
+        const vision = await FilesetResolver.forVisionTasks('/wasm');
+        if (!isMounted) return;
+
+        const landmarker = await PoseLandmarker.createFromOptions(vision, {
+          baseOptions: {
+            modelAssetPath: '/models/pose_landmarker_lite.task',
+            delegate: 'GPU',
+          },
+          runningMode: 'VIDEO',
+          numPoses: 1,
+        });
+
+        if (isMounted) {
+          landmarkerRef.current = landmarker;
+          startCamera();
+        }
+      } catch (e) {
+        console.warn('Failed to load GPU MediaPipe, falling back to CPU:', e);
+        try {
+          const vision = await FilesetResolver.forVisionTasks('/wasm');
+          const landmarker = await PoseLandmarker.createFromOptions(vision, {
+            baseOptions: {
+              modelAssetPath: '/models/pose_landmarker_lite.task',
+              delegate: 'CPU',
+            },
+            runningMode: 'VIDEO',
+            numPoses: 1,
+          });
+          if (isMounted) {
+            landmarkerRef.current = landmarker;
+            startCamera();
+          }
+        } catch (cpuError) {
+          console.error('MediaPipe initialization completely failed:', cpuError);
+        }
+      }
+    }
+
+    initMediaPipe();
+
+    return () => {
+      isMounted = false;
+      stopCamera();
+    };
+  }, [pose]);
+
+  // Start webcam
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: { ideal: 640 }, height: { ideal: 480 }, facingMode: 'user' },
+        audio: false,
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+          videoRef.current?.play();
+          setCameraActive(true);
+          startTrackingLoop();
+        };
+      }
+    } catch (err) {
+      console.warn('Webcam permission not granted or camera not found:', err);
+    }
+  };
+
+  const stopCamera = () => {
+    if (animFrameIdRef.current) {
+      cancelAnimationFrame(animFrameIdRef.current);
+    }
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+    }
+  };
+
+  // Video processing loop
+  const startTrackingLoop = () => {
+    let lastVideoTime = -1;
+
+    const render = () => {
+      const video = videoRef.current;
+      const landmarker = landmarkerRef.current;
+
+      if (video && landmarker && video.readyState >= 2 && !video.paused) {
+        if (video.currentTime !== lastVideoTime) {
+          lastVideoTime = video.currentTime;
+          const results = landmarker.detectForVideo(video, performance.now());
+
+          if (results && results.landmarks && results.landmarks.length > 0) {
+            const rawLandmarks = results.landmarks[0];
+            setLandmarks(rawLandmarks);
+
+            const evalResult = evaluatePose(pose?.id || '', rawLandmarks);
+            setEvaluation(evalResult);
+
+            if (evalResult.isCorrect) {
+              setBestAngle((prev) =>
+                prev === null ? evalResult.primaryAngle : Math.max(prev, evalResult.primaryAngle)
+              );
+            }
+
+            // Speak feedback correction (debounced)
+            if (evalResult.feedback) {
+              voiceCoach.speak(evalResult.feedback);
+            }
+          }
+        }
+      }
+
+      animFrameIdRef.current = requestAnimationFrame(render);
+    };
+
+    animFrameIdRef.current = requestAnimationFrame(render);
+  };
+
+  // Timer Ticker: runs ONLY when evaluation.isCorrect is true for camera poses!
+  useEffect(() => {
+    if (isResting) {
+      const restInterval = setInterval(() => {
+        setRestTimer((prev) => {
+          if (prev <= 1) {
+            setIsResting(false);
+            setHoldTimer(0);
+            return 10;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+      return () => clearInterval(restInterval);
+    }
+
+    const interval = setInterval(() => {
+      // For camera poses, hold timer advances only while posture is correct!
+      // For non-camera poses (e.g. Balasana), timer advances continuously.
+      const shouldTick = pose?.camera_supported ? evaluation.isCorrect : true;
+
+      if (shouldTick) {
+        setHoldTimer((prev) => {
+          const next = prev + 1;
+          if (next >= targetHold) {
+            voiceCoach.speak('Set complete! Aaram karein.');
+            if (currentSet < totalSets) {
+              setIsResting(true);
+              setCurrentSet((s) => s + 1);
+            }
+          }
+          return next;
+        });
+      }
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [evaluation.isCorrect, isResting, targetHold, currentSet, pose?.camera_supported]);
+
+  const handleFinishSession = async (status: 'done' | 'skipped' | 'pain', note?: string) => {
+    if (!user) return;
+    setSubmitting(true);
+    try {
+      await api.logSession({
+        patient_identifier: user.identifier,
+        assignment_id: assignmentId,
+        date: new Date().toISOString().split('T')[0],
+        pose_id: pose?.id || 'tadasana',
+        status: status,
+        best_angle: bestAngle,
+        hold_seconds: holdTimer,
+        note: note || null,
+        source: source,
+      });
+
+      if (source === 'doctor') {
+        navigate('/assigned');
+      } else {
+        navigate('/home');
+      }
+    } catch (err: any) {
+      alert('Failed to log session: ' + err.message);
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handlePainStop = () => {
+    setPainModalOpen(true);
+  };
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-16 text-center text-xs text-slate-400">
+        Loading posture guide...
+      </div>
+    );
+  }
+
+  if (!pose) {
+    return (
+      <div className="max-w-md mx-auto px-4 py-16 text-center space-y-3">
+        <p className="text-sm font-bold text-slate-700">Pose not found.</p>
+        <button
+          onClick={() => navigate(-1)}
+          className="px-4 py-2 bg-teal-700 text-white rounded-xl text-xs"
+        >
+          Go Back
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+      {/* Top Header */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 transition"
+        >
+          <ArrowLeft className="w-4 h-4" /> End Session
+        </button>
+
+        <div className="flex items-center gap-2">
+          {isDebug && (
+            <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-1 bg-amber-100 text-amber-900 rounded-lg">
+              <Bug className="w-3 h-3" /> DEBUG MODE
+            </span>
+          )}
+
+          <button
+            onClick={() => setMuted(!muted)}
+            className="p-2 rounded-xl border border-sand-200 text-slate-600 hover:bg-sand-100 transition"
+            title={muted ? 'Unmute Hinglish voice coach' : 'Mute voice coach'}
+          >
+            {muted ? <VolumeX className="w-4 h-4 text-coral-600" /> : <Volume2 className="w-4 h-4 text-teal-700" />}
+          </button>
+        </div>
+      </div>
+
+      {/* Main Interactive Session Container */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Left Column: Camera / Skeleton Display */}
+        <div className="lg:col-span-2 space-y-4">
+          <div className="relative rounded-3xl overflow-hidden bg-slate-900 aspect-4/3 flex items-center justify-center shadow-xl border border-sand-200">
+            {pose.camera_supported ? (
+              <>
+                <video
+                  ref={videoRef}
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover transform -scale-x-100"
+                />
+                <SkeletonOverlay
+                  landmarks={landmarks}
+                  width={640}
+                  height={480}
+                  isCorrect={evaluation.isCorrect}
+                />
+
+                {/* Overlaid Accuracy Ring */}
+                <div className="absolute top-4 right-4 bg-slate-900/70 backdrop-blur-md rounded-2xl p-2.5 border border-slate-700 shadow-md">
+                  <AccuracyGauge accuracy={evaluation.accuracy} isCorrect={evaluation.isCorrect} />
+                </div>
+
+                {/* Live Hinglish Voice Feedback Pill */}
+                <div className="absolute bottom-4 inset-x-4 flex justify-center">
+                  <div
+                    className={`px-4 py-2.5 rounded-2xl text-xs font-bold text-center shadow-lg backdrop-blur-md transition-all ${
+                      evaluation.isCorrect
+                        ? 'bg-emerald-900/90 text-emerald-100 border border-emerald-500/50'
+                        : 'bg-amber-900/90 text-amber-100 border border-amber-500/50'
+                    }`}
+                  >
+                    🗣️ {evaluation.feedback}
+                  </div>
+                </div>
+
+                {cameraActive && (
+                  <div className="absolute top-4 left-4 flex items-center gap-1.5 px-2.5 py-1 bg-black/60 backdrop-blur-md rounded-full text-[10px] font-semibold text-emerald-400 border border-emerald-500/30">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    AI Camera Active
+                  </div>
+                )}
+
+                {/* Raw Debug Overlay (?debug=1) */}
+                {isDebug && evaluation.rawDebug && (
+                  <div className="absolute top-4 left-4 p-3 bg-black/85 text-[10px] text-green-400 font-mono rounded-xl border border-green-500/30 max-w-[200px]">
+                    <div>Pose: {pose.id}</div>
+                    <div>Accuracy: {evaluation.accuracy}%</div>
+                    {Object.entries(evaluation.rawDebug).map(([k, v]) => (
+                      <div key={k}>
+                        {k}: {typeof v === 'number' ? v.toFixed(1) : String(v)}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              /* Non-Camera Pose Visual Guide */
+              <div className="p-8 text-center text-white space-y-4 max-w-md">
+                <div className="w-16 h-16 rounded-3xl bg-teal-800 text-sand-100 flex items-center justify-center mx-auto shadow-lg">
+                  <Clock className="w-8 h-8" />
+                </div>
+                <div>
+                  <h3 className="text-2xl font-serif font-bold">{pose.english_name}</h3>
+                  <span className="text-teal-300 text-sm font-medium">{pose.hindi_name}</span>
+                </div>
+                <div className="space-y-2 text-left bg-slate-800/80 p-4 rounded-2xl text-xs text-slate-200 border border-slate-700">
+                  <span className="text-[10px] font-bold text-teal-400 uppercase tracking-wider block">
+                    Kaise Karein (Steps):
+                  </span>
+                  {pose.how_to.map((step, idx) => (
+                    <p key={idx} className="leading-relaxed">
+                      {idx + 1}. {step}
+                    </p>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Action Buttons: Done / Skip / Pain Stopped (Section 7) */}
+          <div className="grid grid-cols-3 gap-3">
+            <button
+              onClick={() => handleFinishSession('done')}
+              disabled={submitting}
+              className="py-3.5 px-4 rounded-2xl bg-emerald-700 hover:bg-emerald-800 text-white font-semibold text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-1.5 active:scale-95"
+            >
+              <CheckCircle2 className="w-4 h-4" />
+              Done
+            </button>
+
+            <button
+              onClick={() => handleFinishSession('skipped')}
+              disabled={submitting}
+              className="py-3.5 px-4 rounded-2xl bg-sand-200 hover:bg-sand-300 text-slate-700 font-semibold text-xs sm:text-sm transition flex items-center justify-center gap-1.5"
+            >
+              <XCircle className="w-4 h-4" />
+              Skip
+            </button>
+
+            <button
+              onClick={handlePainStop}
+              disabled={submitting}
+              className="py-3.5 px-4 rounded-2xl bg-coral-50 hover:bg-coral-100 border border-coral-300 text-coral-800 font-bold text-xs sm:text-sm shadow-xs transition flex items-center justify-center gap-1.5 active:scale-95"
+            >
+              <AlertTriangle className="w-4 h-4 text-coral-600" />
+              Pain, I stopped
+            </button>
+          </div>
+        </div>
+
+        {/* Right Column: Telemetry & Pose Guide */}
+        <div className="space-y-4">
+          {/* Hold Timer Card */}
+          <div className="bg-surface rounded-3xl p-6 border border-sand-200 shadow-soft space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Hold Progress
+              </span>
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-teal-50 text-teal-800">
+                Set {currentSet} of {totalSets}
+              </span>
+            </div>
+
+            <div className="text-center py-2">
+              <div className="text-5xl font-serif font-black text-slate-850 tracking-tight">
+                {isResting ? restTimer : holdTimer}
+                <span className="text-xl font-sans text-slate-400 font-medium">/{targetHold}s</span>
+              </div>
+              <span className="text-xs font-medium text-slate-500 mt-1 block">
+                {isResting
+                  ? '🛌 Rest timer... Agla set shuru ho raha hai'
+                  : pose.camera_supported
+                  ? evaluation.isCorrect
+                    ? '🟢 Correct pose! Timer running'
+                    : '🟡 Adjust posture to run timer'
+                  : 'Holding pose comfortably'}
+              </span>
+            </div>
+
+            <div className="w-full h-2.5 rounded-full bg-sand-200 overflow-hidden">
+              <div
+                className={`h-full transition-all duration-300 ${
+                  isResting ? 'bg-amber-500' : 'bg-teal-600'
+                }`}
+                style={{ width: `${Math.min(100, (holdTimer / targetHold) * 100)}%` }}
+              />
+            </div>
+          </div>
+
+          {/* Pose Steps & Caution Card */}
+          <div className="bg-surface rounded-3xl p-6 border border-sand-200 shadow-soft space-y-3">
+            <h3 className="text-base font-serif font-bold text-slate-850">
+              {pose.english_name} ({pose.hindi_name})
+            </h3>
+
+            <div className="space-y-2 text-xs text-slate-600">
+              <span className="font-bold text-slate-700 block">How to do:</span>
+              <ul className="space-y-1.5 list-disc list-inside">
+                {pose.how_to.map((step, idx) => (
+                  <li key={idx} className="leading-relaxed">
+                    {step}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {pose.caution && (
+              <div className="p-3 bg-amber-50/70 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2">
+                <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                <span>{pose.caution}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Pain Confirmation Modal */}
+      {painModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-surface rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-coral-200 space-y-4">
+            <div className="flex items-center gap-3 text-coral-700 font-serif font-bold text-xl">
+              <AlertTriangle className="w-6 h-6 flex-shrink-0" />
+              Report Pain & Stop
+            </div>
+
+            <p className="text-xs text-slate-600 leading-relaxed">
+              Dard hone par turant aasan rokna bilkul sahi faisla hai. Yeh jaankari aapke doctor ki report mein laal nishaan (red flag) ke saath darj ki jayegi.
+            </p>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">
+                Kripya dard ka sthan ya kaisa mehsoos hua likhein:
+              </label>
+              <textarea
+                rows={3}
+                value={painNote}
+                onChange={(e) => setPainNote(e.target.value)}
+                placeholder="e.g., Baayein ghutne mein achanak tez khinchaav mehsoos hua..."
+                className="w-full p-3 rounded-xl border border-sand-200 text-xs text-slate-850 focus:outline-none focus:ring-2 focus:ring-coral-500"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setPainModalOpen(false)}
+                className="px-4 py-2 text-xs font-semibold text-slate-500 hover:bg-sand-100 rounded-xl"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFinishSession('pain', painNote)}
+                disabled={submitting}
+                className="px-5 py-2.5 text-xs font-semibold text-white bg-coral-600 hover:bg-coral-700 rounded-xl transition shadow-md"
+              >
+                Log Pain & End
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
