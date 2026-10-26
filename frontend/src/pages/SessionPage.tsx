@@ -453,6 +453,44 @@ export const SessionPage: React.FC = () => {
 
         {/* Right Column: Telemetry & Pose Guide */}
         <div className="space-y-4">
+          {/* Clinical Demonstration Reference Photo */}
+          <div className="bg-surface rounded-3xl p-5 border border-sand-200 shadow-soft space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-teal-800 bg-teal-50 px-2.5 py-1 rounded-full border border-teal-200/60">
+                📸 {language === 'hi' ? 'क्लिनिकल प्रदर्शन गाइड' : 'Clinical Pose Guide'}
+              </span>
+              {pose.target_angles_text && (
+                <span className="text-[10px] font-semibold text-slate-500">
+                  🎯 {pose.target_angles_text.split('|')[0]}
+                </span>
+              )}
+            </div>
+
+            <div className="relative rounded-2xl overflow-hidden aspect-4/3 bg-slate-100 border border-sand-200 shadow-xs">
+              <img
+                src={pose.image_url || `/poses/${pose.id}.jpg`}
+                alt={getPoseName(pose, language)}
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/poses/tadasana.jpg';
+                }}
+              />
+              <div className="absolute bottom-2 left-2 right-2 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl text-[11px] text-white font-medium flex items-center justify-between">
+                <span>{getPoseName(pose, language)}</span>
+                <span className="text-teal-300 text-[10px]">{getPoseSubtitle(pose, language)}</span>
+              </div>
+            </div>
+
+            {(pose.benefit_en || pose.benefit_hi) && (
+              <div className="p-3 bg-teal-50/80 border border-teal-200/70 rounded-xl text-xs text-teal-950">
+                <span className="font-bold block text-[11px] text-teal-800 mb-0.5">
+                  🩺 {language === 'hi' ? 'चिकित्सीय लाभ:' : 'Clinical Benefit:'}
+                </span>
+                {language === 'hi' ? (pose.benefit_hi || pose.benefit_en) : (pose.benefit_en || pose.benefit_hi)}
+              </div>
+            )}
+          </div>
+
           {/* Hold Timer Card */}
           <div className="bg-surface rounded-3xl p-6 border border-sand-200 shadow-soft space-y-4">
             <div className="flex items-center justify-between">

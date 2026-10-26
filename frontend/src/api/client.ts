@@ -25,6 +25,13 @@ export interface Pose {
   caution_en: string;
   /** Hindi caution */
   caution_hi: string;
+  /** Reference pose demonstration photo URL */
+  image_url?: string;
+  /** Reference target angles description */
+  target_angles_text?: string;
+  /** Clinical/health benefits */
+  benefit_en?: string;
+  benefit_hi?: string;
 }
 
 export interface PlanItem {
