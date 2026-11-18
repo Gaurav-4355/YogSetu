@@ -6,7 +6,7 @@ from app.services.gemma_service import _clean_json_text, _filter_and_validate_pl
 
 def test_poses_json_validity():
     poses = load_poses()
-    assert len(poses) == 10
+    assert len(poses) >= 10
     required_fields = ["id", "hindi_name", "english_name", "how_to", "default_hold_seconds", "camera_supported", "caution"]
     for p in poses:
         for f in required_fields:

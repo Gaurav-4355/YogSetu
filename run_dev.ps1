@@ -12,7 +12,7 @@ if (-not (Test-Path $BackendPython)) {
 
 # Start backend in a separate background job or window
 Write-Host "Starting FastAPI Backend on http://127.0.0.1:8000 ..." -ForegroundColor Green
-$BackendProc = Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot\backend'; .\ .venv\Scripts\Activate.ps1; uvicorn app.main:app --reload --port 8000" -PassThru
+$BackendProc = Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot\backend'; .\.venv\Scripts\uvicorn.exe app.main:app --reload --port 8000" -PassThru
 
 # Start frontend in this window
 Write-Host "Starting Vite React Frontend on http://localhost:5173 ..." -ForegroundColor Green

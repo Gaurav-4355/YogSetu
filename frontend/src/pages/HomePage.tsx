@@ -11,7 +11,9 @@ import {
   Lock,
   ArrowRight,
   AlertCircle,
+  Calendar,
 } from 'lucide-react';
+import { ScheduleEnvironmentModal } from '../components/ScheduleEnvironmentModal';
 
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
@@ -38,6 +40,7 @@ export const HomePage: React.FC = () => {
   const [aiSummary, setAiSummary] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [safetyAlert, setSafetyAlert] = useState<string | null>(null);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -164,9 +167,18 @@ export const HomePage: React.FC = () => {
             </p>
           </div>
 
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sand-100 text-slate-700 text-xs font-bold border border-sand-200">
-            <Lock className="w-3.5 h-3.5 text-teal-600" />
-            {t.onlyYouCanSee}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setScheduleOpen(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold shadow-sm transition"
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              Schedule Classes & Alarm
+            </button>
+            <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-sand-100 text-slate-700 text-xs font-bold border border-sand-200">
+              <Lock className="w-3.5 h-3.5 text-teal-600" />
+              {t.onlyYouCanSee}
+            </div>
           </div>
         </div>
       </div>
@@ -328,6 +340,13 @@ export const HomePage: React.FC = () => {
           })}
         </div>
       </div>
+
+      <ScheduleEnvironmentModal
+        isOpen={scheduleOpen}
+        onClose={() => setScheduleOpen(false)}
+        initialGoal={promptText}
+        initialMinutes={minutesAvailable}
+      />
     </div>
   );
 };

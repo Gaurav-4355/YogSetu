@@ -144,6 +144,13 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
 export const api = {
   health: () => request<{ status: string; service: string; demo_mode: boolean }>('/api/health'),
 
+  login: (body: { identifier: string; name?: string; role?: string }) =>
+    request<{ identifier: string; name: string; role: string; id_type: string }>('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+
   getPoses: () => request<Pose[]>('/api/poses'),
 
   createSelfPlan: (body: { goal_or_concern: string; minutes_available: number; age_group: string }) =>

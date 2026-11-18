@@ -382,5 +382,104 @@
     "target_angles_text": "Torso erect | Joints aligned",
     "benefit_en": "Enhances flexibility, joint mobility, and overall posture.",
     "benefit_hi": "लचीलापन बढ़ाता है और शरीर की मुद्रा को सुधारता है।"
+  },
+  {
+    "id": "virabhadrasana_ii",
+    "english_name": "Warrior II Pose",
+    "hindi_name": "वीरभद्रासन II",
+    "hinglish_name": "Virabhadrasana II (Warrior 2)",
+    "how_to_en": [
+      "Step your feet wide apart, turning right foot out 90 degrees.",
+      "Bend your right knee to a 90-degree angle over your right ankle.",
+      "Extend both arms parallel to the floor, gazing forward over right fingertips.",
+      "Keep your torso erect and hold steady with deep breaths."
+    ],
+    "how_to_hi": [
+      "पैरों को चौड़ा फैलाएं, दाएं पैर को 90 डिग्री बाहर घुमाएं।",
+      "दाएं घुटने को मोड़ें ताकि वह टखने के ठीक ऊपर रहे।",
+      "दोनों हाथों को कंधों की सीध में फैलाएं और दाएं हाथ की उंगलियों की ओर देखें।",
+      "रीढ़ सीधी रखें और स्थिरता से सांस लेते रहें।"
+    ],
+    "how_to": [
+      "Dono pair chauda failayein, daayein pair ko 90 degree bahar karein.",
+      "Daayein ghutne ko modkar aankle ke upar layein.",
+      "Dono haatho ko kandho ki seedh mein failayein aur aage dekhein.",
+      "Peeth seedhi rakhein aur shareer mein shakti mehsus karein."
+    ],
+    "default_hold_seconds": 25,
+    "camera_supported": true,
+    "angle_rules": null,
+    "caution_en": "Do not let the front knee collapse inward or overshoot the ankle.",
+    "caution_hi": "आगे वाले घुटने को अंदर न झुकने दें और टखने के आगे न जाने दें।",
+    "caution": "Aage wale ghutne ko andar na jhukne dein.",
+    "image_url": "/poses/virabhadrasana_ii.jpg",
+    "target_angles_text": "Front knee 90° | Back leg 180° | Arms horizontal",
+    "benefit_en": "Builds isometric stamina in quadriceps and core, expands chest, and enhances mental focus.",
+    "benefit_hi": "पैरों और जांघों को शक्तिशाली बनाता है तथा एकाग्रता और आत्मबल बढ़ाता है।"
+  },
+  {
+    "id": "adho_mukha_svanasana",
+    "english_name": "Downward Facing Dog",
+    "hindi_name": "अधोमुख श्वानासन",
+    "hinglish_name": "Adho Mukha Svanasana (Downward Dog)",
+    "how_to_en": [
+      "Start on hands and knees, then press into hands and lift hips high toward ceiling.",
+      "Form an inverted V-shape, lengthening your spine and pressing heels toward mat.",
+      "Relax your neck and gaze gently toward your navel."
+    ],
+    "how_to_hi": [
+      "हाथों और घुटनों के बल आएं, फिर घुटनों को उठाकर कूल्हों को ऊपर आकाश की ओर उठाएं।",
+      "शरीर से उल्टा V आकार बनाएं और एड़ियों को जमीन की ओर दबाएं।",
+      "गर्दन को ढीला छोड़ें और नाभि की ओर देखें।"
+    ],
+    "how_to": [
+      "Hathheliyo aur pairo ke bal aakar hips ko aakash ki taraf uthayein.",
+      "Shareer se ulta V shape banayein aur peeth ko lamba stretch karein.",
+      "Aediyo ko zameen par lagane ki koshish karein aur saans lein."
+    ],
+    "default_hold_seconds": 30,
+    "camera_supported": true,
+    "angle_rules": null,
+    "caution_en": "Bend knees slightly if your hamstrings feel tight; do not strain wrists.",
+    "caution_hi": "जांघों में खिंचाव हो तो घुटने थोड़े मोड़ें; कलाई पर अधिक दबाव न दें।",
+    "caution": "Hamstrings tight hon to ghutno ko thoda bend rakhein.",
+    "image_url": "/poses/marjaryasana_bitilasana.jpg",
+    "target_angles_text": "Inverted V shape | Spine lengthened | Hips elevated",
+    "benefit_en": "Decompresses the entire spine, calms brain circulation, and stretches hamstrings.",
+    "benefit_hi": "रीढ़ की हड्डी को लंबा करता है, रक्त संचार मस्तिष्क की ओर बढ़ाता है और तनाव घटाता है।"
+  },
+  {
+    "id": "shavasana",
+    "english_name": "Corpse Pose",
+    "hindi_name": "शवासन",
+    "hinglish_name": "Shavasana (Corpse Pose)",
+    "how_to_en": [
+      "Lie flat on your back with feet falling open naturally.",
+      "Rest arms alongside body, palms facing upward toward the ceiling.",
+      "Close your eyes and let every muscle surrender completely into the mat.",
+      "Focus gently on your natural breath flow for deep healing."
+    ],
+    "how_to_hi": [
+      "पीठ के बल लेट जाएं, पैरों को थोड़ा खोलकर ढीला छोड़ें।",
+      "हाथों को शरीर के पास रखें, हथेलियां ऊपर आकाश की ओर हों।",
+      "आंखें बंद करें और शरीर के प्रत्येक अंग को पूरी तरह विश्राम दें।",
+      "शांत मन से धीमी सांसों पर ध्यान केंद्रित करें।"
+    ],
+    "how_to": [
+      "Peeth ke bal latein aur pair thoda failakar dheela chhod dein.",
+      "Haath shareer ke bagal mein rakhein, hathheliya upar aakash ki taraf.",
+      "Aankhein band karein aur shareer ke har hisse ko aaram dein.",
+      "Dheemi saanso par dhyan kendrit karein aur mann ko shaant karein."
+    ],
+    "default_hold_seconds": 60,
+    "camera_supported": true,
+    "angle_rules": null,
+    "caution_en": "Place a small pillow or rolled blanket under knees if lower back feels arched.",
+    "caution_hi": "कमर में खिंचाव हो तो घुटनों के नीचे तकिया रखें।",
+    "caution": "Kamar mein dard ho to ghutno ke niche takiya rakhein.",
+    "image_url": "/poses/setu_bandhasana.jpg",
+    "target_angles_text": "Supine relaxation | Muscle surrender",
+    "benefit_en": "Normalizes blood pressure, clears accumulated lactic acid, and activates profound parasympathetic recovery.",
+    "benefit_hi": "रक्तचाप को नियंत्रित करता है, थकान मिटाता है और मानसिक तनाव को पूरी तरह समाप्त करता है।"
   }
 ]

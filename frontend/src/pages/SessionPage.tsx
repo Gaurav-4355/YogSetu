@@ -9,6 +9,7 @@ import { voiceCoach } from '../lib/speech';
 import { SkeletonOverlay } from '../components/SkeletonOverlay';
 import { AccuracyGauge } from '../components/AccuracyGauge';
 import { getPoseCaution, getPoseName, getPoseSteps, getPoseSubtitle } from '../lib/poseI18n';
+import { getPoseById } from '../lib/posesData';
 import {
   Volume2,
   VolumeX,
@@ -72,15 +73,23 @@ export const SessionPage: React.FC = () => {
   const [painNote, setPainNote] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Load pose details
+  // Load pose details with immediate offline fallback
   useEffect(() => {
-    api.getPoses().then((poses) => {
-      const found = poses.find((p) => p.id === poseId);
-      if (found) {
-        setPose(found);
-      }
-      setLoading(false);
-    });
+    api
+      .getPoses()
+      .then((poses) => {
+        const found = poses.find((p) => p.id === poseId);
+        if (found) {
+          setPose(found);
+        } else {
+          setPose(getPoseById(poseId || 'tadasana'));
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setPose(getPoseById(poseId || 'tadasana'));
+        setLoading(false);
+      });
   }, [poseId]);
 
   // Voice coach sync
@@ -191,7 +200,7 @@ export const SessionPage: React.FC = () => {
             const rawLandmarks = results.landmarks[0];
             setLandmarks(rawLandmarks);
 
-            const evalResult = evaluatePose(pose?.id || '', rawLandmarks);
+            const evalResult = evaluatePose(pose?.id || '', rawLandmarks, language);
             setEvaluation(evalResult);
 
             if (evalResult.isCorrect) {
@@ -254,7 +263,10 @@ export const SessionPage: React.FC = () => {
   }, [evaluation.isCorrect, isResting, targetHold, currentSet, pose?.camera_supported]);
 
   const handleFinishSession = async (status: 'done' | 'skipped' | 'pain', note?: string) => {
-    if (!user) return;
+    if (!user) {
+      navigate('/');
+      return;
+    }
     setSubmitting(true);
     try {
       await api.logSession({
