@@ -15,7 +15,7 @@ services:
         value: gemma-4-31b-it
       - key: DEMO_MODE
         value: "false"
-      - key: DATABASE_URL
+      - key: YOGSETU_DB_URL
         value: sqlite:///./yogsetu.db
       - key: CORS_ORIGINS
         value: "https://yogsetu.onrender.com,https://yogsetu-frontend.onrender.com"

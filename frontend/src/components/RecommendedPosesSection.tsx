@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../context/LanguageContext';
+import { getPoseName, getPoseSubtitle } from '../lib/poseI18n';
 import {
   Calendar,
   Camera,
@@ -34,6 +36,7 @@ export const RecommendedPosesSection: React.FC<RecommendedPosesSectionProps> = (
   onReset,
 }) => {
   const navigate = useNavigate();
+  const { language } = useLanguage();
 
   const handleStartPose = (poseId: string) => {
     navigate(`/session/${poseId}?source=self`);
@@ -151,10 +154,10 @@ export const RecommendedPosesSection: React.FC<RecommendedPosesSectionProps> = (
                   <div className="flex items-start justify-between gap-2">
                     <div>
                       <h4 className="font-serif font-bold text-slate-900 text-lg leading-snug">
-                        {pose.hindi_name} • {pose.english_name}
+                        {getPoseName(pose, language)}
                       </h4>
                       <p className="text-xs text-teal-800 font-medium">
-                        {pose.hinglish_name}
+                        {getPoseSubtitle(pose, language)}
                       </p>
                     </div>
                   </div>

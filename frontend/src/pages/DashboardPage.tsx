@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getUserSchedule, UserScheduleProfile } from '../lib/userStorage';
 import { recommendPosesForProfile } from '../lib/posesData';
+import { getPoseName, getPoseSubtitle } from '../lib/poseI18n';
 import { ScheduleEnvironmentModal } from '../components/ScheduleEnvironmentModal';
 import {
   Play,
@@ -17,6 +19,7 @@ import {
 
 export const DashboardPage: React.FC = () => {
   const { user } = useAuth();
+  const { language } = useLanguage();
   const navigate = useNavigate();
 
   // Load schedule strictly for this user
@@ -188,10 +191,10 @@ export const DashboardPage: React.FC = () => {
                       >
                         <div>
                           <div className="font-bold text-slate-900 dark:text-white">
-                            {item.pose.hindi_name}
+                            {getPoseName(item.pose, language)}
                           </div>
                           <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                            {item.pose.english_name}
+                            {getPoseSubtitle(item.pose, language)}
                           </div>
                         </div>
                         <div className="text-right">
@@ -226,10 +229,10 @@ export const DashboardPage: React.FC = () => {
                       >
                         <div>
                           <div className="font-bold text-slate-900 dark:text-white">
-                            {item.pose.hindi_name}
+                            {getPoseName(item.pose, language)}
                           </div>
                           <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                            {item.pose.english_name}
+                            {getPoseSubtitle(item.pose, language)}
                           </div>
                         </div>
                         <div className="text-right">
@@ -264,10 +267,10 @@ export const DashboardPage: React.FC = () => {
                       >
                         <div>
                           <div className="font-bold text-slate-900 dark:text-white">
-                            {item.pose.hindi_name}
+                            {getPoseName(item.pose, language)}
                           </div>
                           <div className="text-[11px] text-slate-500 dark:text-slate-400">
-                            {item.pose.english_name}
+                            {getPoseSubtitle(item.pose, language)}
                           </div>
                         </div>
                         <div className="text-right">

@@ -8,7 +8,7 @@ import { evaluatePose, PoseEvaluation } from '../lib/poseRules';
 import { voiceCoach } from '../lib/speech';
 import { SkeletonOverlay } from '../components/SkeletonOverlay';
 import { AccuracyGauge } from '../components/AccuracyGauge';
-import { getPoseName, getPoseSteps } from '../lib/poseI18n';
+import { getPoseName, getPoseSteps, getPoseSubtitle } from '../lib/poseI18n';
 import { playChime } from '../components/AlarmModal';
 import { getUserSchedule } from '../lib/userStorage';
 import {
@@ -77,6 +77,11 @@ export const WorkoutRunnerPage: React.FC = () => {
   const [painModalOpen, setPainModalOpen] = useState(false);
   const [painNote, setPainNote] = useState('');
 
+  // Refs for the tracking loop to always read latest values (avoids stale closures)
+  const currentPoseIdRef = useRef<string>('tadasana');
+  const languageRef = useRef(language);
+  const sessionStateRef = useRef<string>(sessionState);
+
   // 1. Build routine sequence from user schedule
   useEffect(() => {
     const selectedInjury =
@@ -113,6 +118,32 @@ export const WorkoutRunnerPage: React.FC = () => {
     ? sequence[poseIndex + 1]
     : currentItem;
   const nextSet = isLastSetOfPose ? 1 : currentSet + 1;
+
+  // Keep tracking-loop refs in sync with React state (placed after currentItem is defined)
+  useEffect(() => {
+    currentPoseIdRef.current = currentItem?.pose.id || 'tadasana';
+  }, [currentItem?.pose.id]);
+
+  useEffect(() => {
+    languageRef.current = language;
+  }, [language]);
+
+  useEffect(() => {
+    sessionStateRef.current = sessionState;
+  }, [sessionState]);
+
+  // Reset evaluation when pose or set changes — camera must re-validate from scratch
+  useEffect(() => {
+    setEvaluation({
+      isCorrect: false,
+      accuracy: 0,
+      feedback: language === 'en' ? 'Step into frame and begin your posture.'
+        : language === 'hi' ? 'फ्रेम में आकर आसन शुरू करें।'
+        : 'Frame mein aakar aasan shuru karein.',
+      primaryAngle: 0,
+      angles: {},
+    });
+  }, [poseIndex, currentSet]);
 
   // 2. Initialize Camera & MediaPipe
   useEffect(() => {
@@ -209,11 +240,11 @@ export const WorkoutRunnerPage: React.FC = () => {
             const rawLandmarks = results.landmarks[0];
             setLandmarks(rawLandmarks);
 
-            const activePoseId = currentItem?.pose.id || 'tadasana';
-            const evalResult = evaluatePose(activePoseId, rawLandmarks, language);
+            const activePoseId = currentPoseIdRef.current;
+            const evalResult = evaluatePose(activePoseId, rawLandmarks, languageRef.current);
             setEvaluation(evalResult);
 
-            if (evalResult.feedback && sessionState === 'active') {
+            if (evalResult.feedback && sessionStateRef.current === 'active') {
               voiceCoach.speak(evalResult.feedback);
             }
           }
@@ -705,8 +736,8 @@ export const WorkoutRunnerPage: React.FC = () => {
                   <Clock className="w-8 h-8" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-serif font-black">{currentItem?.pose.hindi_name}</h3>
-                  <span className="text-teal-300 text-sm font-medium">{currentItem?.pose.english_name}</span>
+                  <h3 className="text-2xl font-serif font-black">{currentItem ? getPoseName(currentItem.pose, language) : ''}</h3>
+                  <span className="text-teal-300 text-sm font-medium">{currentItem ? getPoseSubtitle(currentItem.pose, language) : ''}</span>
                 </div>
                 <div className="space-y-2 text-left bg-slate-800/80 p-4 rounded-2xl text-xs text-slate-200 border border-slate-700">
                   <span className="text-[10px] font-bold text-teal-400 uppercase tracking-wider block">
@@ -805,8 +836,8 @@ export const WorkoutRunnerPage: React.FC = () => {
                     }}
                   />
                   <div className="absolute bottom-2 left-2 right-2 bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl text-xs text-white font-medium flex items-center justify-between">
-                    <span className="font-bold">{currentItem.pose.hindi_name}</span>
-                    <span className="text-teal-300 text-[11px]">{currentItem.pose.english_name}</span>
+                    <span className="font-bold">{getPoseName(currentItem.pose, language)}</span>
+                    <span className="text-teal-300 text-[11px]">{getPoseSubtitle(currentItem.pose, language)}</span>
                   </div>
                 </div>
 
