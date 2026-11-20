@@ -1,8 +1,9 @@
 import json
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from ..config import settings
 from ..db import get_db, Base, engine
 from ..models import User, Doctor, Assignment, SessionRecord
 
@@ -257,6 +258,11 @@ def run_seed(db: Session = Depends(get_db)):
 
 @router.post("/reset")
 def reset_seed(db: Session = Depends(get_db)):
+    if not (settings.ALLOW_RESET or settings.DEMO_MODE):
+        raise HTTPException(
+            status_code=403,
+            detail={"error": {"code": "FORBIDDEN", "message": "Database reset is only permitted when DEMO_MODE or ALLOW_RESET is enabled."}}
+        )
     # Drop all tables and recreate
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)

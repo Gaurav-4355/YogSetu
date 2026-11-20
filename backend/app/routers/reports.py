@@ -10,6 +10,7 @@ from ..schemas import SummaryRequest
 router = APIRouter(prefix="/api", tags=["reports"])
 
 
+# Header-based identity is demo-only to allow instant role switching in judge evaluation.
 @router.get("/report/{identifier}")
 def get_patient_report(
     identifier: str,

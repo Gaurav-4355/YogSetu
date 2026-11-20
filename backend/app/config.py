@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     GEMINI_API_KEY: str = ""
     GEMMA_MODEL_ID: str = "gemma-4-31b-it"
     DEMO_MODE: bool = True
+    ALLOW_RESET: bool = False
     DATABASE_URL: str = "sqlite:///./yogsetu.db"
     YOGSETU_DB_URL: str = ""  # Override DATABASE_URL if set (avoids Render conflict)
     CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,https://yogsetu-frontend.onrender.com,https://yogsetu.onrender.com"
