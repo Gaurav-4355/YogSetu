@@ -79,3 +79,6 @@ def test_security_headers_present(client):
     assert res.headers.get("X-Content-Type-Options") == "nosniff"
     assert res.headers.get("X-Frame-Options") == "DENY"
     assert res.headers.get("Referrer-Policy") == "strict-origin-when-cross-origin"
+    assert res.headers.get("Permissions-Policy") == "camera=(self), microphone=(self)"
+    assert res.headers.get("X-XSS-Protection") == "1; mode=block"
+    assert "Strict-Transport-Security" in res.headers

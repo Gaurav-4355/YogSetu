@@ -58,23 +58,24 @@ export const AlarmModal: React.FC<AlarmModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in" role="dialog" aria-modal="true" aria-labelledby="alarm-modal-title">
       <div className="bg-surface rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-sand-200">
         <div className="flex items-center justify-between pb-4 border-b border-sand-100">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-teal-50 flex items-center justify-center text-teal-700">
-              <Bell className="w-5 h-5" />
+              <Bell className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="text-xl font-serif font-bold text-slate-850">Daily Yoga Reminder</h3>
+              <h3 id="alarm-modal-title" className="text-xl font-serif font-bold text-slate-850">Daily Yoga Reminder</h3>
               <p className="text-xs text-slate-500">In-tab acoustic reminder</p>
             </div>
           </div>
           <button
             onClick={onClose}
+            aria-label="Close daily yoga reminder dialog"
             className="p-2 text-slate-400 hover:text-slate-600 rounded-full hover:bg-sand-100 transition"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5" aria-hidden="true" />
           </button>
         </div>
 
@@ -88,6 +89,7 @@ export const AlarmModal: React.FC<AlarmModalProps> = ({ isOpen, onClose }) => {
               <input
                 type="checkbox"
                 checked={enabled}
+                aria-label="Enable In-Tab Alarm"
                 onChange={(e) => setEnabled(e.target.checked)}
                 className="sr-only peer"
               />
@@ -96,11 +98,13 @@ export const AlarmModal: React.FC<AlarmModalProps> = ({ isOpen, onClose }) => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2">
+            <label htmlFor="alarm-time-input" className="block text-xs font-semibold text-slate-600 uppercase tracking-wider mb-2 cursor-pointer">
               Select Reminder Time
             </label>
             <input
+              id="alarm-time-input"
               type="time"
+              aria-label="Select reminder time"
               value={alarmTime}
               onChange={(e) => setAlarmTime(e.target.value)}
               className="w-full text-2xl font-serif font-bold text-teal-900 bg-teal-50/50 border border-teal-200 rounded-2xl p-4 text-center focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -110,9 +114,10 @@ export const AlarmModal: React.FC<AlarmModalProps> = ({ isOpen, onClose }) => {
           <button
             type="button"
             onClick={playChime}
+            aria-label="Test chime sound"
             className="w-full flex items-center justify-center gap-2 py-2.5 text-xs font-semibold text-teal-700 bg-sand-100 hover:bg-sand-200 rounded-xl transition"
           >
-            <Volume2 className="w-4 h-4" />
+            <Volume2 className="w-4 h-4" aria-hidden="true" />
             Test Temple Bell Chime
           </button>
         </div>

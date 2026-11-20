@@ -471,15 +471,15 @@ export const ScheduleEnvironmentModal: React.FC<ScheduleEnvironmentModalProps> =
       {/* ============================================================== */}
       {/* MAIN MODAL CONTAINER                                           */}
       {/* ============================================================== */}
-      <div className="bg-white rounded-3xl max-w-4xl w-full my-auto shadow-2xl border border-sand-200 overflow-hidden flex flex-col max-h-[92vh]">
+      <div className="bg-white rounded-3xl max-w-4xl w-full my-auto shadow-2xl border border-sand-200 overflow-hidden flex flex-col max-h-[92vh]" role="dialog" aria-modal="true" aria-labelledby="schedule-modal-title">
         {/* Header Bar */}
         <div className="px-6 py-4 bg-slate-900 text-white flex items-center justify-between border-b border-slate-800 flex-shrink-0">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-teal-600/30 border border-teal-500/40 flex items-center justify-center text-teal-400">
-              <Calendar className="w-5 h-5" />
+              <Calendar className="w-5 h-5" aria-hidden="true" />
             </div>
             <div>
-              <h3 className="text-lg sm:text-xl font-serif font-bold text-white leading-tight">
+              <h3 id="schedule-modal-title" className="text-lg sm:text-xl font-serif font-bold text-white leading-tight">
                 {activeStep === 'form' ? 'Schedule Yoga Classes For You' : 'Your 3-Phase Yoga Environment'}
               </h3>
               <p className="text-xs text-slate-400">
@@ -505,10 +505,11 @@ export const ScheduleEnvironmentModal: React.FC<ScheduleEnvironmentModalProps> =
             )}
             <button
               onClick={onClose}
+              aria-label="Close scheduling modal"
               className="p-2 text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition"
               title="Close"
             >
-              <X className="w-5 h-5" />
+              <X className="w-5 h-5" aria-hidden="true" />
             </button>
           </div>
         </div>
@@ -530,12 +531,13 @@ export const ScheduleEnvironmentModal: React.FC<ScheduleEnvironmentModalProps> =
               {/* 1. Name & Age with high-contrast jet black input text */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
+                  <label htmlFor="profile-name-input" className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5 cursor-pointer">
                     Your Full Name <span className="text-red-500">*</span>
                   </label>
                   <div className="relative">
-                    <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                    <User className="w-4 h-4 text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" aria-hidden="true" />
                     <input
+                      id="profile-name-input"
                       type="text"
                       required
                       value={profile.name}
@@ -547,10 +549,11 @@ export const ScheduleEnvironmentModal: React.FC<ScheduleEnvironmentModalProps> =
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5">
+                  <label htmlFor="profile-age-input" className="block text-xs font-bold text-slate-800 uppercase tracking-wider mb-1.5 cursor-pointer">
                     Age <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="profile-age-input"
                     type="number"
                     min={8}
                     max={100}
@@ -565,11 +568,12 @@ export const ScheduleEnvironmentModal: React.FC<ScheduleEnvironmentModalProps> =
               {/* 2. Gmail and Phone (Primary Key for database registration) */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-2xl bg-teal-50/70 border border-teal-200">
                 <div>
-                  <label className="block text-xs font-bold text-teal-950 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                    <Mail className="w-3.5 h-3.5 text-teal-700" />
+                  <label htmlFor="profile-email-input" className="block text-xs font-bold text-teal-950 uppercase tracking-wider mb-1.5 flex items-center gap-1.5 cursor-pointer">
+                    <Mail className="w-3.5 h-3.5 text-teal-700" aria-hidden="true" />
                     Gmail / Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
+                    id="profile-email-input"
                     type="email"
                     required
                     value={profile.email}
@@ -583,11 +587,12 @@ export const ScheduleEnvironmentModal: React.FC<ScheduleEnvironmentModalProps> =
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-teal-950 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-teal-700" />
+                  <label htmlFor="profile-phone-input" className="block text-xs font-bold text-teal-950 uppercase tracking-wider mb-1.5 flex items-center gap-1.5 cursor-pointer">
+                    <Phone className="w-3.5 h-3.5 text-teal-700" aria-hidden="true" />
                     Phone Number (Optional)
                   </label>
                   <input
+                    id="profile-phone-input"
                     type="tel"
                     value={profile.phone}
                     onChange={(e) => setProfile({ ...profile, phone: e.target.value })}

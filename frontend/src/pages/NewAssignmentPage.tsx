@@ -219,11 +219,13 @@ export const NewAssignmentPage: React.FC = () => {
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <div className="sm:col-span-2">
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="patient-id-input" className="block text-xs font-bold text-slate-700 mb-1 cursor-pointer">
               Patient Gmail or Phone Number *
             </label>
             <input
+              id="patient-id-input"
               type="text"
+              aria-required="true"
               placeholder="e.g., patient@gmail.com or 9876543210"
               value={patientId}
               onChange={(e) => setPatientId(e.target.value)}
@@ -232,10 +234,11 @@ export const NewAssignmentPage: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="assignment-weeks-select" className="block text-xs font-bold text-slate-700 mb-1 cursor-pointer">
               Duration (Weeks)
             </label>
             <select
+              id="assignment-weeks-select"
               value={weeks}
               onChange={(e) => setWeeks(Number(e.target.value))}
               className="w-full px-3 py-2.5 rounded-xl border border-sand-200 text-slate-850 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
@@ -250,10 +253,11 @@ export const NewAssignmentPage: React.FC = () => {
         </div>
 
         <div>
-          <label className="block text-xs font-bold text-slate-700 mb-1">
+          <label htmlFor="patient-name-input" className="block text-xs font-bold text-slate-700 mb-1 cursor-pointer">
             Patient Full Name <span className="font-normal text-slate-400">(Optional)</span>
           </label>
           <input
+            id="patient-name-input"
             type="text"
             placeholder="e.g., Rajesh Sharma"
             value={patientName}
