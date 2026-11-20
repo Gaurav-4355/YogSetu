@@ -288,15 +288,42 @@ export function evaluateSetuBandhasana(landmarks: LandmarkPoint[], lang: Languag
     };
   }
 
-  const midShoulders = getMidpoint(landmarks[11], landmarks[12]);
-  const midHips = getMidpoint(landmarks[23], landmarks[24]);
+  const leftShoulder = landmarks[11];
+  const rightShoulder = landmarks[12];
+  const leftHip = landmarks[23];
+  const rightHip = landmarks[24];
+  const leftKnee = landmarks[25];
+  const rightKnee = landmarks[26];
+
+  const shoulderVis = ((leftShoulder?.visibility || 0) + (rightShoulder?.visibility || 0)) / 2;
+  const hipVis = ((leftHip?.visibility || 0) + (rightHip?.visibility || 0)) / 2;
+  const kneeVis = ((leftKnee?.visibility || 0) + (rightKnee?.visibility || 0)) / 2;
+
+  // Real hips and knees must be in view for bridge pose
+  if (shoulderVis < 0.4 || hipVis < 0.35 || kneeVis < 0.3) {
+    return {
+      isCorrect: false,
+      accuracy: 0,
+      feedback:
+        lang === 'en'
+          ? 'Lie on your back on the mat with hips and knees in view.'
+          : lang === 'hi'
+          ? 'कैमरे के सामने चटाई पर पीठ के बल लेटें ताकि कमर और घुटने दिखें।'
+          : 'Mat par peeth ke bal latein taaki kamar aur ghutne camera frame mein dikhein.',
+      primaryAngle: 0,
+      angles: {},
+    };
+  }
+
+  const midShoulders = getMidpoint(leftShoulder, rightShoulder);
+  const midHips = getMidpoint(leftHip, rightHip);
   const leftKneeAngle = calculateAngle(landmarks[23], landmarks[25], landmarks[27]);
   const rightKneeAngle = calculateAngle(landmarks[24], landmarks[26], landmarks[28]);
   const avgKneeAngle = (leftKneeAngle + rightKneeAngle) / 2;
 
-  // Check if user is sitting upright in chair
+  // Check if user is sitting upright in chair (shoulders significantly above hips)
   const spineTilt = calculateVerticalAngle(midShoulders, midHips);
-  const isUpright = spineTilt < 35 && midShoulders.y < midHips.y - 0.18;
+  const isUpright = spineTilt < 35 || midShoulders.y < midHips.y - 0.15;
 
   if (isUpright) {
     return {
@@ -304,10 +331,10 @@ export function evaluateSetuBandhasana(landmarks: LandmarkPoint[], lang: Languag
       accuracy: 10,
       feedback:
         lang === 'en'
-          ? 'Lie on your back with knees bent and feet flat.'
+          ? 'Lie flat on your back on mat and lift your hips.'
           : lang === 'hi'
-          ? 'पीठ के बल लेटें, घुटने मोड़ें और पैर फर्श पर रखें।'
-          : 'Peeth ke bal mat par latein aur ghutne modein.',
+          ? 'पीठ के बल लेटें, घुटने मोड़ें और कमर को ऊपर उठाएं।'
+          : 'Peeth ke bal mat par latein aur kamar ko upar uthayein.',
       primaryAngle: avgKneeAngle,
       angles: { spine_tilt: spineTilt, knee_angle: avgKneeAngle },
     };
@@ -553,16 +580,17 @@ export function evaluatePose(
   }
 
   const shoulderVis = ((landmarks[11]?.visibility || 0) + (landmarks[12]?.visibility || 0)) / 2;
+  const hipVis = ((landmarks[23]?.visibility || 0) + (landmarks[24]?.visibility || 0)) / 2;
 
-  if (shoulderVis < 0.45) {
+  if (shoulderVis < 0.45 || hipVis < 0.35) {
     return {
       isCorrect: false,
       accuracy: 0,
       feedback:
         lang === 'en'
-          ? 'Position yourself in front of camera.'
+          ? 'Position yourself in front of camera with torso visible.'
           : lang === 'hi'
-          ? 'कैमरे के ठीक सामने आएं।'
+          ? 'कैमरे के सामने आएं ताकि शरीर स्पष्ट दिखे।'
           : 'Camera ke samne aakar shareer ko frame mein laayein.',
       primaryAngle: 0,
       angles: {},

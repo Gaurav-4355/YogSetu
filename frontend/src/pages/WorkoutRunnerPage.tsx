@@ -247,6 +247,21 @@ export const WorkoutRunnerPage: React.FC = () => {
             if (evalResult.feedback && sessionStateRef.current === 'active') {
               voiceCoach.speak(evalResult.feedback);
             }
+          } else {
+            // Nobody detected in frame - immediately reset evaluation and halt timer
+            setLandmarks(null);
+            setEvaluation({
+              isCorrect: false,
+              accuracy: 0,
+              feedback:
+                languageRef.current === 'en'
+                  ? 'Step into camera frame to begin posture.'
+                  : languageRef.current === 'hi'
+                  ? 'आसन शुरू करने के लिए कैमरे के सामने आएं।'
+                  : 'Camera ke samne aakar frame mein aasan shuru karein.',
+              primaryAngle: 0,
+              angles: {},
+            });
           }
         }
       }
@@ -350,6 +365,19 @@ export const WorkoutRunnerPage: React.FC = () => {
   // Skip or auto-end rest
   const advanceAfterRest = () => {
     playChime();
+    setHoldTimer(0);
+    setEvaluation({
+      isCorrect: false,
+      accuracy: 0,
+      feedback:
+        language === 'en'
+          ? 'Step into camera frame to begin posture.'
+          : language === 'hi'
+          ? 'आसन शुरू करने के लिए कैमरे के सामने आएं।'
+          : 'Camera ke samne aakar frame mein aasan shuru karein.',
+      primaryAngle: 0,
+      angles: {},
+    });
 
     if (currentSet < totalSets) {
       setCurrentSet((s) => s + 1);
@@ -374,6 +402,19 @@ export const WorkoutRunnerPage: React.FC = () => {
   // Skip current pose manually if user wants
   const handleSkipPose = () => {
     playChime();
+    setHoldTimer(0);
+    setEvaluation({
+      isCorrect: false,
+      accuracy: 0,
+      feedback:
+        language === 'en'
+          ? 'Step into camera frame to begin posture.'
+          : language === 'hi'
+          ? 'आसन शुरू करने के लिए कैमरे के सामने आएं।'
+          : 'Camera ke samne aakar frame mein aasan shuru karein.',
+      primaryAngle: 0,
+      angles: {},
+    });
     if (poseIndex + 1 < sequence.length) {
       setPoseIndex((idx) => idx + 1);
       setCurrentSet(1);
@@ -449,73 +490,7 @@ export const WorkoutRunnerPage: React.FC = () => {
   }
 
   // =========================================================================
-  // VIEW 1: WHOLE JET-BLACK SCREEN REST INTERVAL (Exact user requirement)
-  // =========================================================================
-  if (sessionState === 'rest') {
-    return (
-      <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-6 text-white text-center font-sans select-none animate-fade-in">
-        {/* Subtle breathing relaxation ring */}
-        <div className="relative mb-8 flex items-center justify-center">
-          <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-full border border-teal-500/20 flex items-center justify-center animate-pulse-subtle">
-            <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-teal-950/40 border border-teal-400/30 flex flex-col items-center justify-center shadow-2xl">
-              <span className="text-xs text-teal-300 font-bold uppercase tracking-widest block">
-                Rest & Recover
-              </span>
-              <span className="text-6xl sm:text-7xl font-black font-sans tracking-tight text-white mt-1">
-                {restTimer}s
-              </span>
-              <span className="text-[11px] text-teal-200/80 mt-1">Deep slow breaths</span>
-            </div>
-          </div>
-        </div>
-
-        <h2 className="text-2xl sm:text-3xl font-serif font-black text-white mb-2">
-          Rest Break • Rejuvenate Your Spine
-        </h2>
-        <p className="text-xs sm:text-sm text-slate-400 max-w-md leading-relaxed mb-6">
-          Inhale deeply through your nose for 4 seconds, exhale and release all tension from your joints.
-        </p>
-
-        {/* Up Next Preview */}
-        {nextItem && (
-          <div className="mb-8 px-5 py-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 max-w-sm">
-            <span className="text-teal-400 font-bold block mb-1">
-              Next Asana Unlocks After Rest:
-            </span>
-            <span className="text-white font-bold text-sm">
-              {nextItem ? getPoseName(nextItem.pose, language) : ''}
-            </span>
-            <span className="text-slate-400 text-xs ml-2">
-              (Set {nextSet} of {nextItem.sets})
-            </span>
-          </div>
-        )}
-
-        {/* Controls */}
-        <div className="flex items-center gap-4">
-          <button
-            type="button"
-            onClick={handleSkipRest}
-            className="px-8 py-3.5 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-black text-sm flex items-center gap-2 shadow-xl shadow-teal-600/30 transition transform active:scale-95 cursor-pointer"
-          >
-            <FastForward className="w-4 h-4" />
-            <span>Skip Rest Time (I'm Ready)</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => navigate('/dashboard')}
-            className="px-4 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-semibold border border-slate-800"
-          >
-            End Workout
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // =========================================================================
-  // VIEW 2: SESSION COMPLETED CELEBRATION
+  // VIEW 1: SESSION COMPLETED CELEBRATION
   // =========================================================================
   if (sessionState === 'completed') {
     return (
@@ -571,6 +546,68 @@ export const WorkoutRunnerPage: React.FC = () => {
   // =========================================================================
   return (
     <div className="min-h-screen bg-[#0b0e14] text-slate-100 flex flex-col font-sans selection:bg-teal-500 selection:text-white">
+      {/* WHOLE JET-BLACK SCREEN REST INTERVAL OVERLAY (keeps camera mounted & streaming in background) */}
+      {sessionState === 'rest' && (
+        <div className="fixed inset-0 z-[100] bg-black flex flex-col items-center justify-center p-6 text-white text-center font-sans select-none animate-fade-in">
+          {/* Subtle breathing relaxation ring */}
+          <div className="relative mb-8 flex items-center justify-center">
+            <div className="w-56 h-56 sm:w-64 sm:h-64 rounded-full border border-teal-500/20 flex items-center justify-center animate-pulse-subtle">
+              <div className="w-44 h-44 sm:w-48 sm:h-48 rounded-full bg-teal-950/40 border border-teal-400/30 flex flex-col items-center justify-center shadow-2xl">
+                <span className="text-xs text-teal-300 font-bold uppercase tracking-widest block">
+                  Rest & Recover
+                </span>
+                <span className="text-6xl sm:text-7xl font-black font-sans tracking-tight text-white mt-1">
+                  {restTimer}s
+                </span>
+                <span className="text-[11px] text-teal-200/80 mt-1">Deep slow breaths</span>
+              </div>
+            </div>
+          </div>
+
+          <h2 className="text-2xl sm:text-3xl font-serif font-black text-white mb-2">
+            Rest Break • Rejuvenate Your Spine
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-400 max-w-md leading-relaxed mb-6">
+            Inhale deeply through your nose for 4 seconds, exhale and release all tension from your joints.
+          </p>
+
+          {/* Up Next Preview */}
+          {nextItem && (
+            <div className="mb-8 px-5 py-3 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs text-slate-300 max-w-sm">
+              <span className="text-teal-400 font-bold block mb-1">
+                Next Asana Unlocks After Rest:
+              </span>
+              <span className="text-white font-bold text-sm">
+                {nextItem ? getPoseName(nextItem.pose, language) : ''}
+              </span>
+              <span className="text-slate-400 text-xs ml-2">
+                (Set {nextSet} of {nextItem.sets})
+              </span>
+            </div>
+          )}
+
+          {/* Controls */}
+          <div className="flex items-center gap-4">
+            <button
+              type="button"
+              onClick={handleSkipRest}
+              className="px-8 py-3.5 rounded-2xl bg-teal-600 hover:bg-teal-500 text-white font-black text-sm flex items-center gap-2 shadow-xl shadow-teal-600/30 transition transform active:scale-95 cursor-pointer"
+            >
+              <FastForward className="w-4 h-4" />
+              <span>Skip Rest Time (I'm Ready)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => navigate('/dashboard')}
+              className="px-4 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-400 text-xs font-semibold border border-slate-800"
+            >
+              End Workout
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* 3-SECOND PREPARATION COUNTDOWN OVERLAY */}
       {sessionState === 'prep' && (
         <div className="fixed inset-0 z-[90] bg-slate-950/95 flex flex-col items-center justify-center p-6 text-white text-center animate-fade-in">

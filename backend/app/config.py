@@ -16,8 +16,11 @@ class Settings(BaseSettings):
 
     @property
     def db_url(self) -> str:
-        """Use YOGSETU_DB_URL if set, else fallback to DATABASE_URL."""
-        return self.YOGSETU_DB_URL or self.DATABASE_URL
+        """Use YOGSETU_DB_URL if set, else fallback to DATABASE_URL if valid, else default sqlite."""
+        for candidate in [self.YOGSETU_DB_URL, self.DATABASE_URL]:
+            if candidate and any(candidate.startswith(p) for p in ("sqlite", "postgresql", "postgres", "mysql")):
+                return candidate
+        return "sqlite:///./yogsetu.db"
 
     @property
     def cors_origin_list(self) -> List[str]:

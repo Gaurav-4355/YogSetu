@@ -213,6 +213,21 @@ export const SessionPage: React.FC = () => {
             if (evalResult.feedback) {
               voiceCoach.speak(evalResult.feedback);
             }
+          } else {
+            // Nobody in frame
+            setLandmarks(null);
+            setEvaluation({
+              isCorrect: false,
+              accuracy: 0,
+              feedback:
+                language === 'en'
+                  ? 'Step into frame and begin the pose.'
+                  : language === 'hi'
+                  ? 'फ्रेम में आकर आसन शुरू करें।'
+                  : 'Frame mein khade hokar aasan shuru karein.',
+              primaryAngle: 0,
+              angles: {},
+            });
           }
         }
       }
