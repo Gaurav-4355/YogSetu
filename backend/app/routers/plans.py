@@ -1,8 +1,10 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
-from typing import Optional, List, Dict, Any
+from typing import Any, Dict, List, Optional
+
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+
+from ..schemas import PlanRequest, PlanResponse
+from ..services.gemma_service import generate_plan_from_image, generate_plan_from_text
 from ..services.plan_service import load_poses
-from ..services.gemma_service import generate_plan_from_text, generate_plan_from_image
-from ..schemas import PlanRequest, PlanResponse, DoctorDraftRequest
 
 router = APIRouter(prefix="/api", tags=["plans"])
 

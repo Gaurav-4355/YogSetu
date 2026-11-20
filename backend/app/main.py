@@ -1,13 +1,14 @@
 from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from .config import settings
-from .db import engine, Base, SessionLocal
-from .routers import auth, plans, doctor, patient, reports, seed
+from .db import Base, SessionLocal, engine
+from .routers import auth, doctor, patient, plans, reports, seed
 from .routers.seed import seed_demo_data
 
 

@@ -1,14 +1,15 @@
 import json
-import re
 import logging
-from typing import Optional, List, Dict, Any
+import re
+from typing import Any, Dict, List, Optional
+
 from google import genai
 from google.genai import types
 
 from ..config import settings
-from ..schemas import PlanResponse, PlanItem
-from .safety import check_medical_safety
+from ..schemas import PlanItem, PlanResponse
 from .plan_service import VALID_POSE_IDS, generate_fallback_plan
+from .safety import check_medical_safety
 
 logger = logging.getLogger(__name__)
 

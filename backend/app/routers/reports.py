@@ -1,11 +1,13 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, Header, Query
 from sqlalchemy.orm import Session
-from typing import Optional
+
 from ..db import get_db
+from ..schemas import SummaryRequest
+from ..services.gemma_service import generate_doctor_summary
 from ..services.identity import normalize_identifier
 from ..services.report_service import get_patient_report_data
-from ..services.gemma_service import generate_doctor_summary
-from ..schemas import SummaryRequest
 
 router = APIRouter(prefix="/api", tags=["reports"])
 

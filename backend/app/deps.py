@@ -1,7 +1,7 @@
 from typing import Optional
-from fastapi import Header, Depends
-from sqlalchemy.orm import Session
-from .db import get_db
+
+from fastapi import Header
+
 from .services.identity import normalize_identifier
 
 

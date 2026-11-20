@@ -1,11 +1,12 @@
 import json
 from datetime import datetime, timedelta
+
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ..config import settings
-from ..db import get_db, Base, engine
-from ..models import User, Doctor, Assignment, SessionRecord
+from ..db import Base, engine, get_db
+from ..models import Assignment, Doctor, SessionRecord, User
 
 router = APIRouter(prefix="/api/seed", tags=["seed"])
 

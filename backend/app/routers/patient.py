@@ -1,11 +1,11 @@
 import json
 from datetime import datetime
-from typing import Optional, List, Dict, Any
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from ..db import get_db
-from ..models import User, Assignment, Doctor, SessionRecord
+from ..models import Assignment, Doctor, SessionRecord, User
 from ..schemas import SessionLogRequest
 from ..services.identity import normalize_identifier
 
