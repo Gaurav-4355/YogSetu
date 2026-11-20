@@ -46,8 +46,14 @@ const AppLayout: React.FC = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-background dark:bg-[#0b0e14] text-slate-850 dark:text-slate-100 selection:bg-teal-500 selection:text-white transition-colors">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-teal-600 focus:text-white focus:rounded-xl focus:shadow-lg focus:outline-none"
+      >
+        Skip to main content
+      </a>
       {!isSessionScreen && <Navbar />}
-      <main className="flex-1">
+      <main id="main-content" className="flex-1">
         <Suspense fallback={<PageLoadingFallback />}>
           <Routes>
             <Route path="/" element={<LandingPage />} />

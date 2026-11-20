@@ -224,7 +224,7 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
               <div className="flex items-center gap-3 overflow-hidden">
                 <img
                   src={imagePreview}
-                  alt="Upload preview"
+                  alt={selectedImage?.name ? `User attached photo: ${selectedImage.name}` : "User uploaded posture or prescription image"}
                   className="w-12 h-12 rounded-xl object-cover border border-slate-700 flex-shrink-0"
                 />
                 <div className="truncate text-xs">
@@ -241,6 +241,7 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
                 onClick={handleRemoveImage}
                 className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg transition"
                 title="Remove image"
+                aria-label="Remove image"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -249,7 +250,11 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
 
           {/* Speech Feedback Banner */}
           {speechFeedback && (
-            <div className="mb-2.5 px-3 py-1.5 rounded-xl bg-teal-950/80 border border-teal-800/80 text-teal-300 text-xs flex items-center justify-between">
+            <div
+              role="status"
+              aria-live="polite"
+              className="mb-2.5 px-3 py-1.5 rounded-xl bg-teal-950/80 border border-teal-800/80 text-teal-300 text-xs flex items-center justify-between"
+            >
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-teal-400 animate-ping"></div>
                 <span>{speechFeedback}</span>
@@ -259,6 +264,7 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
                   type="button"
                   onClick={toggleListening}
                   className="underline text-[11px] text-teal-200 font-bold"
+                  aria-label="Stop microphone recording"
                 >
                   Stop Mic
                 </button>
@@ -274,6 +280,7 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
               value={promptText}
               onChange={(e) => setPromptText(e.target.value)}
               onKeyDown={handleKeyDown}
+              aria-label="How can YogSetu help your body today?"
               placeholder="How can YogSetu help your body today? e.g. 'Lower back pain after 8 hours of sitting', '10 min morning posture'..."
               className="w-full bg-transparent text-slate-100 placeholder-slate-400 text-sm sm:text-base resize-none focus:outline-none px-2 pt-1 pb-1 font-sans leading-relaxed"
             />
@@ -289,6 +296,7 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
                 type="file"
                 accept="image/*"
                 onChange={handleImageSelect}
+                aria-label="Upload prescription or posture photo"
                 className="hidden"
               />
               <button
@@ -300,6 +308,7 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                 }`}
                 title="Attach photo or prescription note"
+                aria-label="Attach photo or prescription note"
               >
                 <Plus className="w-4 h-4" />
                 <span className="hidden sm:inline">Attach</span>
@@ -324,6 +333,7 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
                     : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
                 }`}
                 title={isListening ? 'Stop listening' : 'Speak with your voice (Speech-to-Text)'}
+                aria-label={isListening ? 'Stop listening' : 'Speak with your voice (Speech-to-Text)'}
               >
                 {isListening ? (
                   <>
@@ -346,6 +356,7 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
                     : 'bg-slate-800 text-slate-500 cursor-not-allowed'
                 }`}
                 title="Send query"
+                aria-label="Generate AI yoga therapy plan"
               >
                 {isLoading ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />

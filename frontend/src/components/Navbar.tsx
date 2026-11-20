@@ -145,6 +145,8 @@ export const Navbar: React.FC = () => {
                 onClick={() => setLangMenuOpen(!langMenuOpen)}
                 className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl bg-sand-100 dark:bg-slate-800 hover:bg-sand-200 dark:hover:bg-slate-700 border border-sand-200 dark:border-slate-700 text-xs font-semibold text-slate-700 dark:text-slate-200 transition"
                 title="Change Language"
+                aria-label="Change Language"
+                aria-expanded={langMenuOpen}
               >
                 <Globe className="w-3.5 h-3.5 text-teal-600 dark:text-teal-400" />
                 <span className="hidden sm:inline">{languageLabels[language]}</span>
@@ -179,6 +181,7 @@ export const Navbar: React.FC = () => {
             <button
               onClick={() => setAlarmOpen(true)}
               title={t.navAlarm}
+              aria-label={t.navAlarm || "Daily Reminder Alarm"}
               className={`p-2 rounded-xl border transition relative ${
                 alarmEnabled
                   ? 'text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-teal-950/60 border-teal-300 dark:border-teal-700/80 hover:bg-teal-100 dark:hover:bg-teal-900/80'
@@ -228,6 +231,7 @@ export const Navbar: React.FC = () => {
                 <button
                   onClick={handleLogout}
                   title="Sign Out (Return to Landing Page)"
+                  aria-label="Sign Out"
                   className="p-2 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-sand-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />

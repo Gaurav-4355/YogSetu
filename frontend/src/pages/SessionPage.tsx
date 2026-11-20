@@ -393,6 +393,8 @@ export const SessionPage: React.FC = () => {
                 {/* Live Hinglish Voice Feedback Pill */}
                 <div className="absolute bottom-4 inset-x-4 flex justify-center">
                   <div
+                    role="status"
+                    aria-live="polite"
                     className={`px-4 py-2.5 rounded-2xl text-xs font-bold text-center shadow-lg backdrop-blur-md transition-all ${
                       evaluation.isCorrect
                         ? 'bg-emerald-900/90 text-emerald-100 border border-emerald-500/50'
@@ -529,7 +531,7 @@ export const SessionPage: React.FC = () => {
               </span>
             </div>
 
-            <div className="text-center py-2">
+            <div className="text-center py-2" role="status" aria-live="polite">
               <div className="text-5xl font-serif font-black text-slate-850 tracking-tight">
                 {isResting ? restTimer : holdTimer}
                 <span className="text-xl font-sans text-slate-400 font-medium">/{targetHold}s</span>

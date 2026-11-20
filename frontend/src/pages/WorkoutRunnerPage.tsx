@@ -756,6 +756,8 @@ export const WorkoutRunnerPage: React.FC = () => {
                 {/* Live Hinglish/English Voice Feedback Banner */}
                 <div className="absolute bottom-4 inset-x-4 flex justify-center">
                   <div
+                    role="status"
+                    aria-live="polite"
                     className={`px-4 py-2.5 rounded-2xl text-xs font-bold text-center shadow-2xl backdrop-blur-md transition-all max-w-md ${
                       evaluation.isCorrect
                         ? 'bg-emerald-950/90 text-emerald-100 border border-emerald-500/50'
@@ -830,7 +832,7 @@ export const WorkoutRunnerPage: React.FC = () => {
                 </span>
               </div>
 
-              <div className="py-2">
+              <div className="py-2" role="status" aria-live="polite">
                 <div className="text-6xl font-serif font-black text-white tracking-tight">
                   {holdTimer}
                   <span className="text-2xl font-sans text-slate-400 font-medium">/{targetHold}s</span>
