@@ -74,8 +74,9 @@ export const LoginPage: React.FC = () => {
         }
         navigate('/dashboard');
       }
-    } catch (err: any) {
-      setError(err?.message || 'Login failed. Please verify your details.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Login failed. Please verify your details.';
+      setError(msg);
     } finally {
       setLoading(false);
     }

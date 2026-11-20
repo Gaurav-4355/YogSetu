@@ -72,8 +72,9 @@ export const HomePage: React.FC = () => {
         setAiSummary(resp.summary);
         localStorage.setItem('yogsetu_self_plan', JSON.stringify(resp.plan));
       }
-    } catch (err: any) {
-      setError(err?.message || 'Plan generation failed.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Plan generation failed.';
+      setError(msg);
     } finally {
       setLoadingAi(false);
     }
@@ -101,8 +102,9 @@ export const HomePage: React.FC = () => {
         setAiSummary(resp.summary);
         localStorage.setItem('yogsetu_self_plan', JSON.stringify(resp.plan));
       }
-    } catch (err: any) {
-      setError(err?.message || 'Image processing failed.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Image processing failed.';
+      setError(msg);
     } finally {
       setLoadingAi(false);
     }

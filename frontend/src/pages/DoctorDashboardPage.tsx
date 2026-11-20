@@ -25,7 +25,7 @@ export const DoctorDashboardPage: React.FC = () => {
       setLoading(true);
       const data = await api.getDoctorPatients(user?.identifier);
       setPatients(data);
-    } catch (e: any) {
+    } catch (e: unknown) {
       console.error('Failed to load doctor patients:', e);
     } finally {
       setLoading(false);
@@ -44,8 +44,9 @@ export const DoctorDashboardPage: React.FC = () => {
       setMessage('Demo database successfully reset and re-seeded!');
       setTimeout(() => setMessage(null), 3500);
       await fetchPatients();
-    } catch (err: any) {
-      alert('Reset failed: ' + err.message);
+    } catch (err: unknown) {
+      const errMsg = err instanceof Error ? err.message : 'Unknown reset error';
+      alert('Reset failed: ' + errMsg);
     } finally {
       setResetting(false);
     }

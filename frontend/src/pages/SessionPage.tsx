@@ -301,8 +301,9 @@ export const SessionPage: React.FC = () => {
       } else {
         navigate('/home');
       }
-    } catch (err: any) {
-      alert('Failed to log session: ' + err.message);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to log session';
+      alert('Failed to log session: ' + msg);
     } finally {
       setSubmitting(false);
     }

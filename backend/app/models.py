@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Float, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, Float, ForeignKey, Index, Integer, String, Text
 
 from .db import Base
 
@@ -20,6 +20,9 @@ class Doctor(Base):
 
 class Assignment(Base):
     __tablename__ = "assignments"
+    __table_args__ = (
+        Index("idx_assignment_patient_status", "patient_identifier", "status"),
+    )
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     patient_identifier = Column(String, ForeignKey("users.identifier"), nullable=False, index=True)

@@ -71,14 +71,14 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
         setSpeechFeedback('Listening to your voice... Speak your symptom or goal now');
       };
 
-      recognition.onresult = (event: any) => {
+      recognition.onresult = (event: { results: ArrayLike<ArrayLike<{ transcript: string }>> }) => {
         const transcript = Array.from(event.results)
-          .map((r: any) => r[0].transcript)
+          .map((r) => r[0].transcript)
           .join('');
         setPromptText(transcript);
       };
 
-      recognition.onerror = (event: any) => {
+      recognition.onerror = (event: { error?: string }) => {
         console.warn('Speech error:', event.error);
         setIsListening(false);
         if (event.error === 'not-allowed') {

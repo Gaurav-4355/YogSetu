@@ -24,8 +24,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('@mediapipe')) {
-            return 'mediapipe';
+          if (id.includes('node_modules/react') || id.includes('node_modules/react-dom') || id.includes('node_modules/react-router-dom')) {
+            return 'vendor';
+          }
+          if (id.includes('@mediapipe') || id.includes('poseRules')) {
+            return 'mediapipe-pose';
           }
           if (id.includes('recharts')) {
             return 'recharts';

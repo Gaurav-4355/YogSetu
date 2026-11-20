@@ -1,10 +1,10 @@
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, Response, UploadFile
 
 from ..schemas import PlanRequest, PlanResponse
 from ..services.gemma_service import generate_plan_from_image, generate_plan_from_text
-from ..services.plan_service import load_poses
+from ..services.plan_service import VALID_POSES
 
 router = APIRouter(prefix="/api", tags=["plans"])
 
@@ -15,8 +15,10 @@ MAX_TEXT_LENGTH = 1000
 
 
 @router.get("/poses", response_model=List[Dict[str, Any]])
-def get_poses():
-    return load_poses()
+def get_poses(response: Response):
+    # In-memory cached pose data with client cache headers for optimal network efficiency
+    response.headers["Cache-Control"] = "public, max-age=86400"
+    return VALID_POSES
 
 
 @router.post("/plan/self", response_model=PlanResponse)

@@ -78,8 +78,9 @@ export const NewAssignmentPage: React.FC = () => {
         setDraftSummary(resp.summary);
         setNotCovered(resp.not_covered);
       }
-    } catch (err: any) {
-      setError(err?.message || 'Failed to generate plan.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to generate plan.';
+      setError(msg);
     } finally {
       setLoadingAi(false);
     }
@@ -107,8 +108,9 @@ export const NewAssignmentPage: React.FC = () => {
         setDraftSummary(resp.summary);
         setNotCovered(resp.not_covered);
       }
-    } catch (err: any) {
-      setError(err?.message || 'Failed to parse prescription image.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to parse prescription image.';
+      setError(msg);
     } finally {
       setLoadingAi(false);
     }
@@ -174,8 +176,9 @@ export const NewAssignmentPage: React.FC = () => {
 
       alert(`Routine assigned successfully to ${patientName || patientId}!`);
       navigate('/doctor');
-    } catch (err: any) {
-      setError(err?.message || 'Failed to assign routine.');
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Failed to assign routine.';
+      setError(msg);
     } finally {
       setSubmitting(false);
     }
