@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
@@ -6,17 +6,23 @@ import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 
-import { LandingPage } from './pages/LandingPage';
-import { LoginPage } from './pages/LoginPage';
-import { DoctorDashboardPage } from './pages/DoctorDashboardPage';
-import { NewAssignmentPage } from './pages/NewAssignmentPage';
-import { PatientReportPage } from './pages/PatientReportPage';
-import { AssignedDashboardPage } from './pages/AssignedDashboardPage';
-import { HomePage } from './pages/HomePage';
-import { SessionPage } from './pages/SessionPage';
-import { ProgressPage } from './pages/ProgressPage';
-import { DashboardPage } from './pages/DashboardPage';
-import { WorkoutRunnerPage } from './pages/WorkoutRunnerPage';
+const LandingPage = lazy(() => import('./pages/LandingPage').then(m => ({ default: m.LandingPage })));
+const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const DoctorDashboardPage = lazy(() => import('./pages/DoctorDashboardPage').then(m => ({ default: m.DoctorDashboardPage })));
+const NewAssignmentPage = lazy(() => import('./pages/NewAssignmentPage').then(m => ({ default: m.NewAssignmentPage })));
+const PatientReportPage = lazy(() => import('./pages/PatientReportPage').then(m => ({ default: m.PatientReportPage })));
+const AssignedDashboardPage = lazy(() => import('./pages/AssignedDashboardPage').then(m => ({ default: m.AssignedDashboardPage })));
+const HomePage = lazy(() => import('./pages/HomePage').then(m => ({ default: m.HomePage })));
+const SessionPage = lazy(() => import('./pages/SessionPage').then(m => ({ default: m.SessionPage })));
+const ProgressPage = lazy(() => import('./pages/ProgressPage').then(m => ({ default: m.ProgressPage })));
+const DashboardPage = lazy(() => import('./pages/DashboardPage').then(m => ({ default: m.DashboardPage })));
+const WorkoutRunnerPage = lazy(() => import('./pages/WorkoutRunnerPage').then(m => ({ default: m.WorkoutRunnerPage })));
+
+const PageLoadingFallback: React.FC = () => (
+  <div className="flex items-center justify-center min-h-[50vh] p-8 text-teal-700 dark:text-teal-300" role="status" aria-label="Loading page">
+    <div className="w-8 h-8 border-2 border-teal-500/20 border-t-teal-600 rounded-full animate-spin" />
+  </div>
+);
 
 const ProtectedRoute: React.FC<{
   children: React.ReactNode;
@@ -42,79 +48,81 @@ const AppLayout: React.FC = () => {
     <div className="min-h-screen flex flex-col bg-background dark:bg-[#0b0e14] text-slate-850 dark:text-slate-100 selection:bg-teal-500 selection:text-white transition-colors">
       {!isSessionScreen && <Navbar />}
       <main className="flex-1">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
+        <Suspense fallback={<PageLoadingFallback />}>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<LoginPage />} />
 
-          {/* User Personalized Schedule Dashboard */}
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/my-dashboard" element={<Navigate to="/dashboard" replace />} />
+            {/* User Personalized Schedule Dashboard */}
+            <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/my-dashboard" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Automated Hands-Free Sequential Workout Runner */}
-          <Route path="/workout" element={<WorkoutRunnerPage />} />
+            {/* Automated Hands-Free Sequential Workout Runner */}
+            <Route path="/workout" element={<WorkoutRunnerPage />} />
 
-          {/* Doctor Protected Routes */}
-          <Route
-            path="/doctor"
-            element={
-              <ProtectedRoute requiredRole="doctor">
-                <DoctorDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/doctor/assign"
-            element={
-              <ProtectedRoute requiredRole="doctor">
-                <NewAssignmentPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/doctor/report/:identifier"
-            element={
-              <ProtectedRoute requiredRole="doctor">
-                <PatientReportPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Doctor Protected Routes */}
+            <Route
+              path="/doctor"
+              element={
+                <ProtectedRoute requiredRole="doctor">
+                  <DoctorDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/doctor/assign"
+              element={
+                <ProtectedRoute requiredRole="doctor">
+                  <NewAssignmentPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/doctor/report/:identifier"
+              element={
+                <ProtectedRoute requiredRole="doctor">
+                  <PatientReportPage />
+                </ProtectedRoute>
+              }
+            />
 
-          {/* Patient / Normal User Routes */}
-          <Route
-            path="/assigned"
-            element={
-              <ProtectedRoute>
-                <AssignedDashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/home"
-            element={
-              <ProtectedRoute>
-                <HomePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/session/:poseId"
-            element={
-              <ProtectedRoute allowGuest>
-                <SessionPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/progress"
-            element={
-              <ProtectedRoute>
-                <ProgressPage />
-              </ProtectedRoute>
-            }
-          />
+            {/* Patient / Normal User Routes */}
+            <Route
+              path="/assigned"
+              element={
+                <ProtectedRoute>
+                  <AssignedDashboardPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <HomePage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/session/:poseId"
+              element={
+                <ProtectedRoute allowGuest>
+                  <SessionPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/progress"
+              element={
+                <ProtectedRoute>
+                  <ProgressPage />
+                </ProtectedRoute>
+              }
+            />
 
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
       </main>
       {!isSessionScreen && <Footer />}
     </div>

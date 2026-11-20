@@ -36,10 +36,10 @@ class SessionRecord(Base):
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     patient_identifier = Column(String, ForeignKey("users.identifier"), nullable=False, index=True)
     assignment_id = Column(Integer, ForeignKey("assignments.id"), nullable=True, index=True)
-    date = Column(String, nullable=False)  # ISO date string YYYY-MM-DD
+    date = Column(String, nullable=False, index=True)  # ISO date string YYYY-MM-DD
     pose_id = Column(String, nullable=False)
     status = Column(String, nullable=False)  # 'done' | 'skipped' | 'pain'
     best_angle = Column(Float, nullable=True)
     hold_seconds = Column(Integer, nullable=False, default=0)
     note = Column(String, nullable=True)
-    source = Column(String, nullable=False, default="doctor")  # 'doctor' | 'self'
+    source = Column(String, nullable=False, default="doctor", index=True)  # 'doctor' | 'self'

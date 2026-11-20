@@ -13,4 +13,21 @@ export default defineConfig({
       },
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('@mediapipe')) {
+            return 'mediapipe';
+          }
+          if (id.includes('recharts')) {
+            return 'recharts';
+          }
+          if (id.includes('lucide-react')) {
+            return 'icons';
+          }
+        },
+      },
+    },
+  },
 });

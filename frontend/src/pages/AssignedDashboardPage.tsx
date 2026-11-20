@@ -30,7 +30,7 @@ export const AssignedDashboardPage: React.FC = () => {
       })
       .catch((err) => console.error('Failed to load assigned dashboard:', err))
       .finally(() => setLoading(false));
-  }, [user]);
+  }, [user?.identifier]);
 
   const activeAssignment = assignments.find((a) => a.status === 'active') || assignments[0];
 

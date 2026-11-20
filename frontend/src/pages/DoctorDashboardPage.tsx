@@ -34,7 +34,7 @@ export const DoctorDashboardPage: React.FC = () => {
 
   useEffect(() => {
     fetchPatients();
-  }, [user]);
+  }, [user?.identifier]);
 
   const handleResetDemo = async () => {
     if (!window.confirm('Reset all demo sessions and restore 14-day preseeded history?')) return;
