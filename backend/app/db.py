@@ -5,7 +5,8 @@ from .config import settings
 
 engine = create_engine(
     settings.db_url,
-    connect_args={"check_same_thread": False} if "sqlite" in settings.db_url else {}
+    connect_args={"check_same_thread": False} if "sqlite" in settings.db_url else {},
+    pool_pre_ping=True,
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

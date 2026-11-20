@@ -1,7 +1,7 @@
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from ..db import get_db
@@ -12,9 +12,9 @@ router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 class LoginRequest(BaseModel):
-    identifier: str
-    name: Optional[str] = None
-    role: str = "user"  # "user" | "doctor"
+    identifier: str = Field(..., min_length=3, max_length=255)
+    name: Optional[str] = Field(default=None, max_length=100)
+    role: str = Field(default="user", max_length=20)  # "user" | "doctor"
 
 
 @router.post("/login")

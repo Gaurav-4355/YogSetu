@@ -221,8 +221,8 @@ export const LoginPage: React.FC = () => {
           <form onSubmit={handleSignIn} className="space-y-4">
             <div>
               <div className="flex items-center justify-between mb-1.5">
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
-                  {isPhone ? <Phone className="w-3.5 h-3.5 text-teal-600" /> : <Mail className="w-3.5 h-3.5 text-teal-600" />}
+                <label htmlFor="login-identifier-input" className="text-xs font-bold text-slate-700 dark:text-slate-300 flex items-center gap-1.5 cursor-pointer">
+                  {isPhone ? <Phone className="w-3.5 h-3.5 text-teal-600" aria-hidden="true" /> : <Mail className="w-3.5 h-3.5 text-teal-600" aria-hidden="true" />}
                   <span>Gmail or Phone Number</span>
                 </label>
                 <span
@@ -236,7 +236,9 @@ export const LoginPage: React.FC = () => {
                 </span>
               </div>
               <input
+                id="login-identifier-input"
                 type="text"
+                aria-required="true"
                 placeholder="e.g. priya@gmail.com or 9876543210"
                 value={identifier}
                 onChange={(e) => setIdentifier(e.target.value)}
@@ -245,10 +247,11 @@ export const LoginPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
+              <label htmlFor="login-displayname-input" className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5 cursor-pointer">
                 Display Name <span className="font-normal text-slate-400 dark:text-slate-500">(Optional)</span>
               </label>
               <input
+                id="login-displayname-input"
                 type="text"
                 placeholder={role === 'doctor' ? 'e.g. Dr. Aarav Mehta' : 'e.g. Priya Sharma'}
                 value={displayName}
