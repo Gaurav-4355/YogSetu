@@ -33,7 +33,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all during demo/dev
+    allow_origins=settings.cors_origin_list if not settings.DEMO_MODE else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

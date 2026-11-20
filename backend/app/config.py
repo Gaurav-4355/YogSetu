@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     GEMMA_MODEL_ID: str = "gemma-4-31b-it"
     DEMO_MODE: bool = True
     DATABASE_URL: str = "sqlite:///./yogsetu.db"
-    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173"
+    CORS_ORIGINS: str = "http://localhost:5173,http://127.0.0.1:5173,https://yogsetu-frontend.onrender.com,https://yogsetu.onrender.com"
     HOST: str = "127.0.0.1"
     PORT: int = 8000
 
