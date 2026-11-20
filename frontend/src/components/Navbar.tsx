@@ -75,7 +75,7 @@ export const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
 
   const languageLabels: Record<Language, string> = {
@@ -204,12 +204,13 @@ export const Navbar: React.FC = () => {
                 </div>
 
                 <Link
-                  to={user.role === 'doctor' ? '/doctor' : '/assigned'}
+                  to={user.role === 'doctor' ? '/doctor' : '/dashboard'}
                   className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
                     user.role === 'doctor'
-                      ? 'bg-teal-50 dark:bg-teal-950/80 text-teal-800 dark:text-teal-300 border-teal-200 dark:border-teal-800'
-                      : 'bg-sand-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border-sand-200 dark:border-slate-700'
+                      ? 'bg-teal-50 dark:bg-teal-950/80 text-teal-800 dark:text-teal-300 border-teal-200 dark:border-teal-800 hover:bg-teal-100 dark:hover:bg-teal-900 transition'
+                      : 'bg-sand-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-300 border-sand-200 dark:border-slate-700 hover:bg-sand-200 dark:hover:bg-slate-700 transition'
                   }`}
+                  title={user.role === 'doctor' ? 'Open Doctor Portal' : 'Open My Dashboard'}
                 >
                   {user.role === 'doctor' ? (
                     <>
@@ -226,8 +227,8 @@ export const Navbar: React.FC = () => {
 
                 <button
                   onClick={handleLogout}
-                  title={t.navLogout}
-                  className="p-2 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-sand-100 dark:hover:bg-slate-800 rounded-xl transition"
+                  title="Sign Out (Return to Landing Page)"
+                  className="p-2 text-slate-500 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-sand-100 dark:hover:bg-slate-800 rounded-xl transition cursor-pointer"
                 >
                   <LogOut className="w-4 h-4" />
                 </button>
@@ -235,9 +236,9 @@ export const Navbar: React.FC = () => {
             ) : (
               <Link
                 to="/login"
-                className="px-4 py-1.5 text-xs font-semibold bg-teal-600 hover:bg-teal-500 text-white rounded-xl transition shadow-xs"
+                className="px-4 py-1.5 text-xs font-bold bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-white rounded-xl transition shadow-md flex items-center gap-1.5"
               >
-                Sign In
+                <span>Sign In / Join</span>
               </Link>
             )}
           </div>

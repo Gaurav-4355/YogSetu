@@ -40,6 +40,7 @@ export default {
       },
       fontFamily: {
         serif: ['Fraunces', 'Georgia', 'serif'],
+        instrument: ['"Instrument Serif"', 'Fraunces', 'Georgia', 'serif'],
         sans: ['"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
       },
       boxShadow: {

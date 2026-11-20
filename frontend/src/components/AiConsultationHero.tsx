@@ -7,6 +7,23 @@ import {
   Sparkles,
 } from 'lucide-react';
 
+/**
+ * Single sacred Shloka: "योगः कर्मसु कौशलम्" (Bhagavad Gita 2.50)
+ * Alternates serenely in a single clean line every 30 seconds:
+ * 1) Sanskrit (Devanagari): योगः कर्मसु कौशलम्
+ * 2) 3 Native Meaning Terms separated by dots: Yoga • Action • Excellence
+ */
+const KARMASU_STAGES = [
+  {
+    text: "योगः कर्मसु कौशलम्",
+    fontClass: "font-serif font-black tracking-tight",
+  },
+  {
+    text: "Yoga • Action • Excellence",
+    fontClass: "font-instrument italic font-normal tracking-wide sm:text-6xl md:text-7xl text-4xl",
+  },
+];
+
 interface AiConsultationHeroProps {
   onSubmit: (data: { text: string; imageFile: File | null }) => void;
   isLoading?: boolean;
@@ -19,6 +36,15 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
   const [isListening, setIsListening] = useState(false);
   const [speechSupported, setSpeechSupported] = useState(true);
   const [speechFeedback, setSpeechFeedback] = useState<string | null>(null);
+  const [stageIndex, setStageIndex] = useState(0);
+
+  // Changes serenely after 30 seconds (not 'jaldi jaldi')
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setStageIndex((prev) => (prev + 1) % KARMASU_STAGES.length);
+    }, 30000);
+    return () => clearInterval(timer);
+  }, []);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const recognitionRef = useRef<any>(null);
@@ -173,15 +199,22 @@ export const AiConsultationHero: React.FC<AiConsultationHeroProps> = ({ onSubmit
           <span>YogSetu AI Therapy • Gemma 4 Vision</span>
         </div>
 
-        {/* Headline matching user reference image */}
-        <div className="space-y-2">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-sans font-bold text-slate-100 tracking-tight">
-            What should we work on?
-          </h1>
-          <p className="text-sm sm:text-base text-slate-400 max-w-xl mx-auto font-sans">
-            Write your symptoms, upload an exercise sheet or prescription, or talk with your voice.
-          </p>
-        </div>
+        {/* Single Sacred Shloka in ONE clean line, transitioning every 30s:
+            1) Sanskrit: योगः कर्मसु कौशलम् (Fraunces serif)
+            2) English: Yoga • Action • Excellence (Instrument Serif) */}
+        {(() => {
+          const currentStage = KARMASU_STAGES[stageIndex];
+          return (
+            <div className="w-full flex items-center justify-center max-w-4xl mx-auto py-1">
+              <h1
+                key={stageIndex}
+                className={`text-3xl sm:text-5xl md:text-6xl text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-100 to-cyan-300 drop-shadow-md text-center py-4 px-2 leading-relaxed animate-fade-in transition-all duration-700 select-none ${currentStage.fontClass}`}
+              >
+                {currentStage.text}
+              </h1>
+            </div>
+          );
+        })()}
 
         {/* Multi-modal Prompt Capsule Card */}
         <div className="w-full bg-[#1e232d] border border-slate-700/70 hover:border-slate-600/90 rounded-3xl p-3 sm:p-4 shadow-2xl transition-all duration-200">

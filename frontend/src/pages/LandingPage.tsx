@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Activity,
   Camera,
@@ -27,6 +27,7 @@ import {
 
 export const LandingPage: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [loadingAi, setLoadingAi] = useState(false);
   const [submittedQuery, setSubmittedQuery] = useState('');
   const [aiSummary, setAiSummary] = useState<string | null>(null);
@@ -201,12 +202,35 @@ export const LandingPage: React.FC = () => {
         )}
 
         {aiSummary && recommendedItems.length > 0 && !loadingAi && (
-          <div className="bg-[#fbf9f5] text-slate-900 py-12 transition-colors">
+          <div className="bg-[#fbf9f5] dark:bg-[#0c1017] text-slate-900 dark:text-white py-12 transition-colors">
+            {!user && (
+              <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mb-6">
+                <div className="p-4 rounded-2xl bg-teal-50 dark:bg-teal-950/70 border border-teal-200 dark:border-teal-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                  <div className="flex items-center gap-2.5 text-teal-900 dark:text-teal-200">
+                    <ShieldCheck className="w-5 h-5 text-teal-600 dark:text-teal-400 flex-shrink-0" />
+                    <span>
+                      <strong>Save your routine & progress:</strong> Sign in with Gmail or Phone to sync your daily routine, lock in camera AI tracking, and connect alarm reminders.
+                    </span>
+                  </div>
+                  <Link
+                    to="/login"
+                    className="px-4 py-2 rounded-xl bg-teal-600 hover:bg-teal-500 text-white font-bold whitespace-nowrap shadow-xs transition"
+                  >
+                    Sign In / Create Profile →
+                  </Link>
+                </div>
+              </div>
+            )}
+
             <RecommendedPosesSection
               summary={aiSummary}
               items={recommendedItems}
               userGoal={submittedQuery}
               onOpenSchedule={() => {
+                if (!user) {
+                  navigate('/login');
+                  return;
+                }
                 setScheduleModalStep('form');
                 setAutoStartWorkout(false);
                 setIsScheduleOpen(true);
