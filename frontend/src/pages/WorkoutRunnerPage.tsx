@@ -643,7 +643,12 @@ export const WorkoutRunnerPage: React.FC = () => {
             <p className="text-xs text-slate-300">
               Yoga therapy should never cause sharp or pinching pain. Where did you feel discomfort?
             </p>
+            <label htmlFor="workout-pain-textarea" className="sr-only">
+              Discomfort description
+            </label>
             <textarea
+              id="workout-pain-textarea"
+              aria-label="Describe where discomfort occurred"
               value={painNote}
               onChange={(e) => setPainNote(e.target.value)}
               placeholder="e.g. Sharp pinch in right lower back, knee tenderness..."

@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { AccuracyGauge } from '../components/AccuracyGauge';
+import { AlarmModal } from '../components/AlarmModal';
 import {
   normalizeUserStorageKey,
   getUserScheduleStorageKey,
@@ -9,6 +10,15 @@ import {
   clearUserSchedule
 } from '../lib/userStorage';
 import type { UserScheduleProfile } from '../components/ScheduleEnvironmentModal';
+
+describe('Modal Keyboard Accessibility', () => {
+  it('dismisses AlarmModal when Escape key is pressed', () => {
+    let closed = false;
+    render(<AlarmModal isOpen={true} onClose={() => { closed = true; }} />);
+    fireEvent.keyDown(window, { key: 'Escape' });
+    expect(closed).toBe(true);
+  });
+});
 
 describe('AccuracyGauge Component', () => {
   it('renders accuracy percentage and holding status correctly', () => {

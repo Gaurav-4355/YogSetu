@@ -97,22 +97,23 @@ yogsetu/
 │   │   ├── data/poses.json      # Single source of truth for 10 therapeutic poses
 │   │   ├── routers/             # auth, plans, doctor, patient, reports, seed
 │   │   └── services/            # gemma_service, plan_service, report_service, safety, identity
-│   ├── tests/                   # 22 integration tests (health, poses, safety, plans, seed guard)
+│   ├── tests/                   # 32 integration tests (health, poses, safety, plans, auth, session, seed guard)
 │   ├── ruff.toml                # Ruff backend linter configuration
 │   ├── requirements.txt         # Pinned Python dependencies
 │   └── pytest.ini
 ├── frontend/
 │   ├── public/
 │   │   ├── models/              # Local MediaPipe pose_landmarker_lite.task (5.7MB)
+│   │   ├── poses/               # Optimized WebP therapeutic pose illustrations (with JPG fallback)
 │   │   └── wasm/                # Local MediaPipe WASM runtime assets
 │   ├── src/
 │   │   ├── api/client.ts        # Typed fetch client with demo identity headers
 │   │   ├── components/          # Navbar, Footer, PoseCard, SkeletonOverlay, AccuracyGauge, AlarmModal
 │   │   ├── context/             # AuthContext, LanguageContext, ThemeContext
 │   │   ├── i18n/                # en, hi, hinglish localization dictionaries
-│   │   ├── lib/                 # angles.ts, poseRules.ts, speech.ts, identity.ts
+│   │   ├── lib/                 # angles.ts, poseRules.ts, speech.ts, identity.ts, posesData.ts
 │   │   ├── pages/               # Route-level lazy loaded pages (Landing, Login, Doctor, WorkoutRunner...)
-│   │   └── test/                # Vitest & React Testing Library test suite
+│   │   └── test/                # 19 Vitest & React Testing Library tests (routing, math/angles, a11y, storage)
 │   ├── package.json
 │   ├── tailwind.config.js       # Palette: Teal, Sand, Coral + Instrument Serif & Fraunces fonts
 │   └── vite.config.ts           # Vitest configuration & Rollup manual chunk code-splitting

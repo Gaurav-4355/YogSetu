@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Bell, Volume2, X, Check } from 'lucide-react';
 
 interface AlarmModalProps {
@@ -44,6 +44,16 @@ export const AlarmModal: React.FC<AlarmModalProps> = ({ isOpen, onClose }) => {
     return localStorage.getItem('yogsetu_alarm_enabled') === 'true';
   });
   const [saved, setSaved] = useState(false);
+
+  // Accessibility: Allow keyboard users to dismiss modal via Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
 
   const handleSave = () => {
     localStorage.setItem('yogsetu_alarm_time', alarmTime);

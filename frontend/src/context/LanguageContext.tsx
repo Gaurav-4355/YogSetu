@@ -19,6 +19,12 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     localStorage.setItem('yogsetu_lang', lang);
   };
 
+  // Synchronize document element language attribute for screen readers & a11y audits
+  React.useEffect(() => {
+    const langCode = language === 'hi' ? 'hi' : 'en';
+    document.documentElement.lang = langCode;
+  }, [language]);
+
   const t = translations[language] || translations.hinglish;
 
   return (

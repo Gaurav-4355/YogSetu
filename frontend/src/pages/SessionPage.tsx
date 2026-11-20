@@ -605,7 +605,7 @@ export const SessionPage: React.FC = () => {
             </p>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="session-pain-note-textarea" className="block text-xs font-bold text-slate-700 mb-1 cursor-pointer">
                 {language === 'hi'
                   ? 'कृपया दर्द का स्थान या कैसा महसूस हुआ लिखें:'
                   : language === 'en'
@@ -613,6 +613,7 @@ export const SessionPage: React.FC = () => {
                   : 'Kripya dard ka sthan ya kaisa mehsoos hua likhein:'}
               </label>
               <textarea
+                id="session-pain-note-textarea"
                 rows={3}
                 value={painNote}
                 onChange={(e) => setPainNote(e.target.value)}

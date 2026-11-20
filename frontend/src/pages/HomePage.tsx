@@ -215,10 +215,11 @@ export const HomePage: React.FC = () => {
 
         <div className="space-y-4">
           <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">
+            <label htmlFor="home-goal-textarea" className="block text-xs font-bold text-slate-700 mb-1 cursor-pointer">
               {language === 'hi' ? 'आपका लक्ष्य या समस्या' : language === 'en' ? 'Your Goal or Concern' : 'Aapka Goal ya Samasya'}
             </label>
             <textarea
+              id="home-goal-textarea"
               rows={2}
               value={promptText}
               onChange={(e) => setPromptText(e.target.value)}
@@ -229,10 +230,11 @@ export const HomePage: React.FC = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">
+              <label htmlFor="home-minutes-select" className="block text-xs font-bold text-slate-700 mb-1 cursor-pointer">
                 {t.minutesAvailable}
               </label>
               <select
+                id="home-minutes-select"
                 value={minutesAvailable}
                 onChange={(e) => setMinutesAvailable(Number(e.target.value))}
                 className="w-full px-3 py-2.5 rounded-xl border border-sand-200 text-xs text-slate-850"
@@ -245,8 +247,9 @@ export const HomePage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">{t.ageGroup}</label>
+              <label htmlFor="home-agegroup-select" className="block text-xs font-bold text-slate-700 mb-1 cursor-pointer">{t.ageGroup}</label>
               <select
+                id="home-agegroup-select"
                 value={ageGroup}
                 onChange={(e) => setAgeGroup(e.target.value)}
                 className="w-full px-3 py-2.5 rounded-xl border border-sand-200 text-xs text-slate-850"

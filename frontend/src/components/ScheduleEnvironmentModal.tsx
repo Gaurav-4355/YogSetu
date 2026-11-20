@@ -105,6 +105,16 @@ export const ScheduleEnvironmentModal: React.FC<ScheduleEnvironmentModalProps> =
   // Step state: 'form' | 'environment'
   const [activeStep, setActiveStep] = useState<'form' | 'environment'>('form');
 
+  // Accessibility: Allow keyboard users to dismiss modal via Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   // Generated Environment Data (Warmup + Exercise + Relax)
   const [environmentData, setEnvironmentData] = useState<{
     summary: string;
