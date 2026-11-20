@@ -25,6 +25,7 @@ def normalize_identifier(raw: str) -> Tuple[str, str]:
 
 
 def validate_identifier(raw: str) -> bool:
+    """Validates whether a raw string is a well-formed email address or valid phone number."""
     identifier, id_type = normalize_identifier(raw)
     if id_type == "email":
         return bool(re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", identifier))

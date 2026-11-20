@@ -1,13 +1,15 @@
-import json
 import hashlib
+import json
 from pathlib import Path
-from typing import List, Dict, Any
-from ..schemas import PlanResponse, PlanItem
+from typing import Any, Dict, List
+
+from ..schemas import PlanItem, PlanResponse
 
 POSES_FILE = Path(__file__).parent.parent / "data" / "poses.json"
 
 
 def load_poses() -> List[Dict[str, Any]]:
+    """Loads all clinical yoga poses from the local poses.json seed file."""
     with open(POSES_FILE, "r", encoding="utf-8") as f:
         return json.load(f)
 

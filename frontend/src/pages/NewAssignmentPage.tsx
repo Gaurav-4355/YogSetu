@@ -133,7 +133,7 @@ export const NewAssignmentPage: React.FC = () => {
     setDraftPlan(draftPlan.filter((_, idx) => idx !== index));
   };
 
-  const handleUpdateItem = (index: number, field: keyof PlanItem, value: any) => {
+  const handleUpdateItem = (index: number, field: keyof PlanItem, value: PlanItem[keyof PlanItem]) => {
     const updated = [...draftPlan];
     updated[index] = { ...updated[index], [field]: value };
     setDraftPlan(updated);

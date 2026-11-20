@@ -175,7 +175,7 @@ export const api = {
   assignRoutine: (body: {
     patient_identifier: string;
     patient_name?: string;
-    plan: any;
+    plan: PlanResponse | Record<string, unknown>;
     weeks: number;
   }) =>
     request<{ success: boolean; assignment_id: number; message: string }>('/api/assign', {

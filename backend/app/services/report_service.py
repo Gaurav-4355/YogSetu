@@ -1,7 +1,9 @@
 from datetime import datetime, timedelta
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
 from sqlalchemy.orm import Session
-from ..models import SessionRecord, Assignment, User, Doctor
+
+from ..models import Assignment, Doctor, SessionRecord, User
 from .gemma_service import generate_doctor_summary
 
 
@@ -16,8 +18,6 @@ def compute_streak(daily_status: Dict[str, str]) -> int:
     """Computes active consecutive day streak ending today/yesterday."""
     today = datetime.now().date()
     streak = 0
-    # Check backwards from today
-    check_date = today
     # If today hasn't been logged yet, allow streak to start from yesterday
     today_str = today.strftime("%Y-%m-%d")
     yesterday_str = (today - timedelta(days=1)).strftime("%Y-%m-%d")
